@@ -1,10 +1,3 @@
----
-output:
-  html_document:
-    highlight: tango
-    theme: united
----
-
 # QTLpoly
 
 The R package `qtlpoly` (v. 0.1-0) is an under development software to map quantitative trait loci (QTL) in full-sib families of outcrossing autopolyploid species based on a random-effect multiple QTL model (Pereira et al. 2019).
