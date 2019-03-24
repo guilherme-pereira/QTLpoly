@@ -4,7 +4,7 @@ The R package `qtlpoly` (v. 0.1-0) is an under development software to map quant
 
 Variance components associated with putative QTL  are tested using score statistics from the R package `varComp` (v. 0.2-0) (Qu et al. 2013). Final models are fitted using residual maximum likelihood (REML) from the R package `sommer` (v. 3.6) (Covarrubias-Pazaran 2016). Plots for visualizing the results are based on `ggplot2` (v. 3.1.0) (Wickham 2016). 
 
-## Install and load the `qtlpoly` package and data
+## Install `qtlpoly` package
 
 As mentioned, the package `qtlpoly` depends on a couple of functions from `sommer` (v. 3.6) and `varComp` (v. 0.2-0). `varComp` has been [archived from CRAN](https://cran.r-project.org/src/contrib/Archive/varComp/), while `sommer` has been constantly updated (currently, in its v. 3.7). In order to avoid conflit with updates in functions and object structures, we decided to stick with an earlier `sommer` version (v. 3.6), so you will need to downgrade if you have installed the most recent version of `sommer`.
 
@@ -19,7 +19,7 @@ As mentioned, the package `qtlpoly` depends on a couple of functions from `somme
 
 ## Tutorial
 
-Simulated and real data set analyses will be posted here accordingly in order to help users to get familiar with the software and allow them to perform their own analyses:
+Simulated and real data set analyses will be listed here opportunately in order to help users to get familiar with the software and allow them to perform their own analyses:
 
 1. [Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly](http)
 
