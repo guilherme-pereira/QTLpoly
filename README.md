@@ -21,7 +21,7 @@ As mentioned, the package `qtlpoly` depends on a couple of functions from `somme
 
 Simulated and real data set analyses will be listed here opportunately in order to help users to get familiar with the software and allow them to perform their own analyses:
 
-1. [Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly](http)
+1. [Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly](https://drive.google.com/open?id=1jm4Grwqj7dwekqw0glHitiWwttuh5Sbm)
 
 ## Acknowledgments
 
