@@ -1,6 +1,11 @@
 language: r
 cache: packages
 
+install:
+- R -e 'devtools::install_url("https://cran.r-project.org/src/contrib/Archive/varComp/varComp_0.2-0.tar.gz")'
+- R -e 'devtools::install_version("sommer", version = "3.6", repos = "http://cran.us.r-project.org")'
+- R -e 'devtools::install_url("https://cran.r-project.org/src/contrib/Archive/varComp/varComp_0.2-0.tar.gz")'
+
 r_build_args: --no-build-vignettes
 r_check_args: --no-vignettes
 
