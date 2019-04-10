@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/guilherme-pereira/QTLpoly.svg?branch=master)](https://travis-ci.org/mmollina/MAPpoly) [![Development](https://img.shields.io/badge/development-active-blue.svg)](https://img.shields.io/badge/development-active-blue.svg)
+[![Build Status](https://travis-ci.org/guilherme-pereira/QTLpoly.svg?branch=master)](https://travis-ci.org/guilherme-pereira/QTLpoly) [![Development](https://img.shields.io/badge/development-active-blue.svg)](https://img.shields.io/badge/development-active-blue.svg)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # QTLpoly
