@@ -20,9 +20,9 @@ As mentioned, the package `qtlpoly` depends on a couple of functions from `somme
 > devtools::install_github("guilherme-pereira/qtlpoly") 
 ```
 
-## Tutorial
+## Documents
 
-Simulated and real data set analyses will be listed here opportunately in order to help users to get familiar with the software and allow them to perform their own analyses:
+Tutorials as well as simulated and real data set analyses will be listed here opportunately in order to help users to get familiar with the software and allow them to perform their own analyses:
 
 1. [Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly](https://guilherme-pereira.github.io/QTLpoly/1-tutorial)
 
