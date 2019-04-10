@@ -15,5 +15,5 @@ Imports:
 Suggests: mappoly, R.rsp, rmarkdown, devtools
 VignetteBuilder: R.rsp
 Remotes:
-    cran/varComp
+    mmollina/MAPpoly
 RoxygenNote: 6.1.1
