@@ -1,0 +1,21 @@
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Article",
+         title = "Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population",
+         author = c(person("Guilherme da Silva", "Pereira"),
+                    person("Dorcus C.", "Gemenet"),
+                    person("Marcelo", "Mollinari"),
+                    person("Bode", "Olukolu"),
+                    person("Joshua C.", "Wood"),
+                    person("Federico", "Diaz"),
+                    person("Veronica", "Mosquera"),
+                    person("Wolfgang J.", "Gruneberg"),
+                    person("Awais", "Khan"),
+                    person("C. Robin", "Buell"),
+                    person("G. Craig", "Yencho"),
+                    person("Zhao-Bang", "Zeng")),
+         year = "2019",
+         journal = "bioRxiv",
+         doi = "10.1101/XXXXXXv1",
+         note = note,
+         url = "https://github.com/guilherme-pereira/qtlpoly")
