@@ -32,10 +32,10 @@ This package has been developed as part of the [Genomic Tools for Sweetpotato Im
 
 ## References
 
-Covarrubias-Pazaran G. 2016. “Genome-assisted prediction of quantitative traits using the R package sommer.” PLoS ONE 11 (6): 1-15. [https://doi.org/10.1371/journal.pone.0156744](doi:10.1371/journal.pone.0156744).
+Covarrubias-Pazaran G. 2016. “Genome-assisted prediction of quantitative traits using the R package sommer.” PLoS ONE 11 (6): 1-15. [doi:10.1371/journal.pone.0156744](https://doi.org/10.1371/journal.pone.0156744).
 
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB. 2019. “Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population.” bioRxiv [https://doi.org/10.1101/622951](doi:10.1101/622951).
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB. 2019. “Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population.” bioRxiv [doi:10.1101/622951](https://doi.org/10.1101/622951).
 
-Qu L, Guennel T, Marshall SL. 2013. “Linear score tests for variance components in linear mixed models and applications to genetic association studies.” Biometrics 69 (4): 883-892. [https://doi.org/10.1111/biom.12095](doi:10.1111/biom.12095).
+Qu L, Guennel T, Marshall SL. 2013. “Linear score tests for variance components in linear mixed models and applications to genetic association studies.” Biometrics 69 (4): 883-892. [doi:10.1111/biom.12095](https://doi.org/10.1111/biom.12095).
 
 Wickham H. 2016. ggplot2: Elegant Graphics for Data Analysis. Springer.
