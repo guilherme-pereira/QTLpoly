@@ -20,7 +20,7 @@ As mentioned, the package `qtlpoly` depends on a couple of functions from `somme
 > devtools::install_github("guilherme-pereira/qtlpoly") 
 ```
 
-Do not update `sommer` to the most recent version even if R asks you to do so. 
+Do not update `sommer` to the most recent version even if R asks you to do so while installing `qtlpoly`. 
 
 ## Documents
 
