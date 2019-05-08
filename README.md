@@ -9,7 +9,7 @@ Variance components associated with putative QTL  are tested using score statist
 
 ## Install `qtlpoly` package
 
-As mentioned, the package `qtlpoly` depends on a couple of functions from `sommer` (v. 3.6) and `varComp` (v. 0.2-0). `varComp` has been [archived from CRAN](https://cran.r-project.org/src/contrib/Archive/varComp/), while `sommer` has been [constantly updated](https://cran.r-project.org/web/packages/sommer/index.html) (currently, in its v. 3.8). In order to avoid conflit with updates in functions and object structures, we decided to stick with an earlier `sommer` version (v. 3.6), so you will need to downgrade if you have installed the most recent version of `sommer`.
+As mentioned, the package `qtlpoly` depends on a couple of functions from `sommer` (v. 3.6) and `varComp` (v. 0.2-0). `varComp` has been [archived from CRAN](https://cran.r-project.org/src/contrib/Archive/varComp/), while `sommer` has been [constantly updated](https://cran.r-project.org/web/packages/sommer/index.html) (currently, in its v. 3.9). In order to avoid conflit with updates in functions and object structures, we decided to stick with an earlier `sommer` version (v. 3.6), so you will need to downgrade if you have installed the most recent version of `sommer`.
 
 `qtlpoly` package is available here on [GitHub](https://github.com/guilherme-pereira/qtlpoly). You can install all needed packages within R using the functions from the R package `devtools`:
 
@@ -17,7 +17,7 @@ As mentioned, the package `qtlpoly` depends on a couple of functions from `somme
 > install.packages("devtools")
 > devtools::install_url("https://cran.r-project.org/src/contrib/Archive/varComp/varComp_0.2-0.tar.gz")
 > devtools::install_version("sommer", version = "3.6", repos = "http://cran.us.r-project.org")
-> devtools::install_github("guilherme-pereira/qtlpoly") 
+> devtools::install_github("guilherme-pereira/qtlpoly", upgrade = FALSE) 
 ```
 
 Do not update `sommer` to the most recent version even if R asks you to do so while installing `qtlpoly`. 
