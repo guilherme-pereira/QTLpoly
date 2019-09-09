@@ -81,7 +81,7 @@ plot_sint <- function(data, model, pheno.col=NULL, main=NULL, drop=FALSE) {
 
   ggplot(data = DF) +
   facet_grid(~ lg, scales = "free_x", space = "free_x") +
-    geom_boxplot(aes(x=trait, ymin = lower, lower = lower, middle = pos, upper = upper, ymax = upper, color=trait, fill = trait), position = position_dodge(1), stat="identity", size = 0) +
+    geom_boxplot(aes(x=trait, ymin = lower, lower = lower, middle = pos, upper = upper, ymax = upper, color=trait, fill = trait, group = interaction(trait, pos)), position = position_dodge(1), stat="identity", size = 0) +
     geom_crossbar(aes(x=trait, y=pos, ymin = -10, ymax = -10), width = 1, position=position_dodge(1)) +
     scale_fill_manual(values = trait.color) +
     scale_color_manual(values = trait.color) +
