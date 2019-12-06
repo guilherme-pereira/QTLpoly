@@ -62,7 +62,7 @@ plot_qtl <- function(data=data, model=model, fitted=fitted, pheno.col=NULL, main
     t <- which(model$pheno.col == pheno.col[p])
     nqtl <- dim(model$results[[t]]$qtls)[1]
     pvls <- model$results[[t]]$qtls[,6]
-    if(any(pvls == "<1.00e-16")) pvls[which(pvls == "<1.00e-16")] <- 1.00e-16
+    if(any(pvls == "<2.22e-16")) pvls[which(pvls == "<2.22e-16")] <- 2.22e-16
     if(!is.null(nqtl)) {
       trt <- c(trt, rep(names(model$results)[[t]], nqtl))
       lgs <- c(lgs, unlist(model$results[[t]]$qtls[1:nqtl,1]))
