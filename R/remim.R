@@ -475,7 +475,7 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
       qtls[, c(1,2,3,5,6)] <- sapply(qtls[, c(1,2,3,5,6)], as.numeric)
       qtls[, c(2,5)] <- round(qtls[, c(2,5)], digits = 2)
       qtls[, c(6)] <- formatC(qtls[, c(6)], format="e", digits = 2)
-      if(any(qtls[, c(6)] == "0.00e+00")) qtls[which(qtls[,6] == "0.00e+00"), c(6)] <- "<1.00e-16"
+      if(any(qtls[, c(6)] == "0.00e+00")) qtls[which(qtls[,6] == "0.00e+00"), c(6)] <- "<2.22e-16"
       if(!is.null(d.sint)) {
         low <- upp <- c()
         for(q in 1:nqtl) {
@@ -497,14 +497,14 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
         lower[, c(1,2,3,5,6)] <- sapply(lower[, c(1,2,3,5,6)], as.numeric)
         lower[, c(2,5)] <- round(lower[, c(2,5)], digits = 2)
         lower[, c(6)] <- formatC(lower[, c(6)], format="e", digits = 2)
-        if(any(lower[, c(6)] == "0.00e+00")) lower[which(lower[,6] == "0.00e+00"), c(6)] <- "<1.00e-16"
+        if(any(lower[, c(6)] == "0.00e+00")) lower[which(lower[,6] == "0.00e+00"), c(6)] <- "<2.22e-16"
 
         upper <- as.data.frame(matrix(upp, ncol=6, byrow=TRUE), stringsAsFactors=FALSE)
         colnames(upper) <- c("LG", "Pos_upper", "Nmrk_upper", "Mrk_upper", "Score_upper", "Pval_upper")
         upper[, c(1,2,3,5,6)] <- sapply(upper[, c(1,2,3,5,6)], as.numeric)
         upper[, c(2,5)] <- round(upper[, c(2,5)], digits = 2)
         upper[, c(6)] <- formatC(upper[, c(6)], format="e", digits = 2)
-        if(any(upper[, c(6)] == "0.00e+00")) upper[which(upper[,6] == "0.00e+00"), c(6)] <- "<1.00e-16"
+        if(any(upper[, c(6)] == "0.00e+00")) upper[which(upper[,6] == "0.00e+00"), c(6)] <- "<2.22e-16"
 
       } else {
         lower <- upper <- NULL
