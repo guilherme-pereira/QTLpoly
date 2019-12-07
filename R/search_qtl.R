@@ -213,7 +213,7 @@ search_qtl <- function(data, model, w.size = 15, sig.fwd = 0.01, polygenes = FAL
       qtls[, c(1,2,3,5,6)] <- sapply(qtls[, c(1,2,3,5,6)], as.numeric)
       qtls[, c(2,5)] <- round(qtls[, c(2,5)], digits = 2)
       qtls[, c(6)] <- formatC(qtls[, c(6)], format="e", digits = 2)
-      if(any(qtls[, c(6)] == "0.00e+00")) qtls[which(qtls[,6] == "0.00e+00"), c(6)] <- "<1.00e-16"
+      if(any(qtls[, c(6)] == "0.00e+00")) qtls[which(qtls[,6] == "0.00e+00"), c(6)] <- "<2.22e-16"
     } else {
       qtls <- NULL
     }
