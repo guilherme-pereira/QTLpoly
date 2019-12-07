@@ -138,7 +138,7 @@ fit_model <- function(data, model, probs=c("joint","marginal"), polygenes=c("non
             Gstar <- apply(data$G[ind,ind,markers], MARGIN = c(1,2), sum)/length(markers); Gstar[1:5,1:5]
             m <- model$results[[p]]$qtls[q,"Nmrk"]
             ETA <- list(g=list(Z=t(data$Z[,m,ind]),K=data$Pi),gstar=list(Z=Zstar,K=Gstar))
-            fitted[[q]] <- mmer(Y=Y, Z=ETA, silent=TRUE)
+            fitted[[q]] <- mmer(Y=Y, Z=ETA, silent=TRUE, date.warning=FALSE)
             H2 <- unlist(fitted[[q]]$var.comp)[1]/sum(unlist(fitted[[q]]$var.comp))
             qtl <- c(qtl, c(model$results[[p]]$qtls[q,c(1:3)], unlist(fitted[[q]]$beta.hat), unlist(fitted[[q]]$var.comp), H2))
           }
@@ -150,7 +150,7 @@ fit_model <- function(data, model, probs=c("joint","marginal"), polygenes=c("non
           markers <- model$results[[p]]$qtls[,"Nmrk"]
           Gstar <- apply(data$G[ind,ind,markers], MARGIN = c(1,2), sum)/length(markers); Gstar[1:5,1:5]
           ETA <- list(gstar=list(Z=Zstar,K=Gstar))
-          fitted <- mmer(Y=Y, Z=ETA, silent=TRUE)
+          fitted <- mmer(Y=Y, Z=ETA, silent=TRUE, date.warning=FALSE)
           H2 <- unlist(fitted$var.comp)[1]/sum(unlist(fitted$var.comp))
           qtl <- c(rep(NA, 4*nqtl), unlist(fitted$beta.hat), unlist(fitted$var.comp), H2)
           qtls <- as.data.frame(cbind(rbind(model$results[[p]]$qtls[,c(1:3)], rep(NA, 3)), matrix(qtl, ncol=4, byrow=TRUE), stringsAsFactors=FALSE))
@@ -164,7 +164,7 @@ fit_model <- function(data, model, probs=c("joint","marginal"), polygenes=c("non
             names(eta) <- paste(c("a","b","c"), rep(q,3), sep="")
             ETA <- c(ETA, eta)
           }
-          fitted <- mmer(Y=Y, Z=ETA, silent=TRUE)
+          fitted <- mmer(Y=Y, Z=ETA, silent=TRUE, date.warning=FALSE)
           qtl <- c()
           for(q in 1:nqtl) {
             H2 <- sum(unlist(fitted$var.comp)[(1:3)+((q-1)*3)])/sum(unlist(fitted$var.comp))
