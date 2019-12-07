@@ -78,11 +78,15 @@ plot_sint <- function(data, model, pheno.col=NULL, main=NULL, drop=FALSE) {
   DF$trait <- factor(DF$trait, levels = unique(DF$trait))
   DF$lg <- factor(DF$lg, levels = unique(DF$lg))
   trait.color <- c("black", hcl(h = seq(15, 375, length = nlevels(DF$trait)), l = 65, c = 100)[1:nlevels(DF$trait)])
+  bxp.table <- table(interaction(DF$trait, DF$lg))
+  bxp.width <- c(bxp.table[unlist(lapply(interaction(DF$trait, DF$lg), function(x) which(names(bxp.table) %in% x)))])
+  bxp.width <- ifelse(bxp.width == 1, 1, bxp.width-.25)
 
+  suppressWarnings({
   ggplot(data = DF) +
   facet_grid(~ lg, scales = "free_x", space = "free_x") +
     geom_boxplot(aes(x=trait, ymin = lower, lower = lower, middle = pos, upper = upper, ymax = upper, color=trait, fill = trait, group = interaction(trait, pos)), position = position_dodge(0), stat="identity", size = 0) +
-    geom_crossbar(aes(x=trait, y=pos, ymin = -10, ymax = -10), width = 1, position=position_dodge(0)) +
+    geom_crossbar(aes(x=trait, y=pos, ymin = -10, ymax = -10), width = bxp.width, position=position_dodge(0)) +
     scale_fill_manual(values = trait.color) +
     scale_color_manual(values = trait.color) +
     coord_cartesian(ylim = c(max(upper), 5)) +
@@ -92,6 +96,7 @@ plot_sint <- function(data, model, pheno.col=NULL, main=NULL, drop=FALSE) {
     theme(legend.title=element_blank(), axis.text.x=element_blank(), legend.position="bottom",
           title=element_text(face="bold"), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), axis.ticks.x=element_blank(),
           panel.spacing = unit(0.2, "lines"), strip.text.x = element_text(size = 10), plot.title = element_text(face="bold", hjust = 0.5))
+  })
 
 
   # ggplot(DF, aes(x = lg, ymin = lower, lower = lower, middle = pos, upper = upper, ymax = upper, group = interaction(trait, lg))) +
