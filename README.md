@@ -5,13 +5,13 @@
 
 The R package `qtlpoly` (v. 0.1-0) is an under development software to map quantitative trait loci (QTL) in full-sib families of outcrossing autopolyploid species based on a random-effect multiple QTL model (Pereira et al. 2019). 
 
-In order to do so, you will need a genetic map from which conditional probabilities of putative QTL can be computed. We recommend [`MAPpoly`](https://github.com/mmollina/MAPpoly) (Mollinari and Garcia 2019), a hidden Markov model-based R package to construct genetic maps in autopolyploids.
+In order to do so, you will need a genetic map from which conditional probabilities of putative QTL can be computed. We recommend [`MAPpoly`](https://github.com/mmollina/MAPpoly), a hidden Markov model-based R package to construct genetic maps in autopolyploids (Mollinari and Garcia 2019).
 
 Variance components associated with putative QTL are tested using score statistics from the R package `varComp` (v. 0.2-0) (Qu et al. 2013). Final models are fitted using residual maximum likelihood (REML) from the R package `sommer` (v. 3.6) (Covarrubias-Pazaran 2016). Plots for visualizing the results are based on `ggplot2` (v. 3.1.0) (Wickham 2016). 
 
 ## Install `qtlpoly` package
 
-As mentioned, the package `qtlpoly` depends on a couple of functions from `sommer` (v. 3.6) and `varComp` (v. 0.2-0). `varComp` has been [archived from CRAN](https://cran.r-project.org/src/contrib/Archive/varComp/), while `sommer` has been [constantly updated](https://cran.r-project.org/web/packages/sommer/index.html) (currently, in its v. 3.9). In order to avoid conflit with updates in functions and object structures, we decided to stick with an earlier `sommer` version (v. 3.6), so you will need to downgrade if you have installed the most recent version of `sommer`.
+As mentioned, the package `qtlpoly` depends on a couple of functions from `sommer` (v. 3.6) and `varComp` (v. 0.2-0). `varComp` has been [archived from CRAN](https://cran.r-project.org/src/contrib/Archive/varComp/), while `sommer` has been [constantly updated](https://cran.r-project.org/web/packages/sommer/index.html). In order to avoid conflit with updates in functions and object structures, we decided to stick with an earlier `sommer` version (v. 3.6), stable to our needs, so you will need to downgrade if you have installed the most recent version of `sommer`.
 
 `qtlpoly` package is available here on [GitHub](https://github.com/guilherme-pereira/qtlpoly). You can install all needed packages within R using the functions from the R package `devtools`:
 
