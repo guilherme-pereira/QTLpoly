@@ -38,7 +38,7 @@ This package has been developed as part of the [Genomic Tools for Sweetpotato Im
 
 Covarrubias-Pazaran G. 2016. “Genome-assisted prediction of quantitative traits using the R package sommer.” PLoS ONE 11 (6): 1-15. [doi:10.1371/journal.pone.0156744](https://doi.org/10.1371/journal.pone.0156744).
 
-Mollinari M, Garcia AAF. 2019. “Linkage analysis and haplotype phasing in experimental autopolyploid populations with high ploidy level using hidden Markov models.” [doi:10.1534/g3.119.400378](https://doi.org/10.1534/g3.119.400378).
+Mollinari M, Garcia AAF. 2019. “Linkage analysis and haplotype phasing in experimental autopolyploid populations with high ploidy level using hidden Markov models.” G3: Genes, Genomes, Genetics 9 (10): 3297-3314. [doi:10.1534/g3.119.400378](https://doi.org/10.1534/g3.119.400378).
 
 Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB. 2019. “Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population.” bioRxiv [doi:10.1101/622951](https://doi.org/10.1101/622951).
 
