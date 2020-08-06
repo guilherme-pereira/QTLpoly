@@ -4,9 +4,13 @@
 #'
 #' @param data an object of class \code{qtlpoly.data}.
 #'
+#' @param offset.data a data frame with the same dimensions of \code{data$pheno} containing offset variables; if \code{NULL} (default), no offset variables are considered.
+#' 
 #' @param model an object of class \code{qtlpoly.model} containing the QTL to be optimized.
 #'
 #' @param sig.bwd the desired score-based \emph{p}-value threshold for backward elimination, e.g. 0.0001 (default).
+#'
+#' @param score.null an object of class \code{qtlpoly.null} with results of score statistics from resampling.
 #'
 #' @param polygenes if \code{TRUE} all QTL but the one being tested are treated as a single polygenic effect, if \code{FALSE} (default) all QTL effect variances have to estimated.
 #'
@@ -57,30 +61,47 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
 #'     
-#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
+#'
+#'     Zou F, Fine JP, Hu J, Lin DY (2004) An efficient resampling method for assessing genome-wide statistical significance in mapping quantitative trait loci. \emph{Genetics} 168 (4): 2307-16. \url{doi.org/10.1534/genetics.104.031427}
 #'
 #' @export optimize_qtl
 #' @import varComp parallel
 
-optimize_qtl <- function(data, model, sig.bwd = 0.0001, polygenes = FALSE, n.clusters = NULL, plot = "optimize", verbose = TRUE) {
-
+optimize_qtl <- function(data, offset.data = NULL, model, sig.bwd = 0.05, score.null = NULL, polygenes = FALSE, n.clusters = NULL, plot = "optimize", verbose = TRUE) {
+  
   if(is.null(n.clusters)) n.clusters <- 1
   cat("INFO: Using", n.clusters, "CPUs for calculation\n\n")
   cl <- makeCluster(n.clusters)
   clusterEvalQ(cl, require(varComp))
-
+  
+  sig.bwd0 <- sig.bwd
+  
+  if(!is.null(score.null)) {
+    min.pvl <- numeric(length(score.null$results))
+    for(p in 1:length(score.null$results)) {
+      min.pvl[p] <- min(score.null$results[[p]]$pval)
+    }        
+  } else if(!is.null(model$min.pvl)) {
+    min.pvl <- model$min.pvl
+  }
+  
   if(!is.null(plot)) plot <- paste(plot, "pdf", sep = ".")
   results <- vector("list", length(model$results))
   names(results) <- names(model$results)
-  w.size <- model$w.size/data$step
-
+  
   for(p in 1:length(results)) {
-
+    
+    if(!is.null(min.pvl)) {
+      sig.bwd <- quantile(sort(min.pvl), sig.bwd0)#; cat(sig.bwd, "\n")
+    } else {
+      sig.bwd <- sig.bwd0
+    }
+    
     start <- proc.time()
     pheno.col <- model$results[[p]]$pheno.col
-    w.size <- w.size/data$step
     stat <- model$results[[p]]$stat
     pval <- model$results[[p]]$pval
     qtl.mrk <- model$results[[p]]$qtl[,"Nmrk"]
@@ -94,7 +115,12 @@ optimize_qtl <- function(data, model, sig.bwd = 0.0001, polygenes = FALSE, n.clu
     if(!is.null(plot)) pdf(paste(colnames(data$pheno)[pheno.col], plot, sep = "_"))
     ind <- rownames(data$pheno)[which(!is.na(data$pheno[,pheno.col]))]
     Y <- data$pheno[ind,pheno.col]
-
+    if(is.null(offset.data)) {
+      offset <- NULL
+    } else {
+      offset <- offset.data[ind,pheno.col]
+    }
+    
     qtl.out <- c(1)
     while(!is.null(qtl.out)) {
       qtl.out <- c()
@@ -103,7 +129,7 @@ optimize_qtl <- function(data, model, sig.bwd = 0.0001, polygenes = FALSE, n.clu
         markers.out <- c((data$cum.nmrk[qtl.lgr[1]]+1):(data$cum.nmrk[qtl.lgr[1]+1]))
         temp <- parSapply(cl, as.character(markers.out), function(x) { #like first search
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]))
+          full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]), offset = offset)
           test <- varComp.test(full.mod, null=integer(0L))
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
@@ -151,20 +177,20 @@ optimize_qtl <- function(data, model, sig.bwd = 0.0001, polygenes = FALSE, n.clu
             }
             if(polygenes) {
               Gstar <- apply(data$G[ind,ind,qtl.mrk0], MARGIN = c(1,2), sum)/length(qtl.mrk0); Gstar[1:5,1:5]
-              full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar))
+              full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar), offset = offset)
               control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
               temp <- parSapply(cl, as.character(markers.out), function(x) {
                 m <- as.numeric(x)
-                full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control)
+                full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control, offset = offset)
                 test <- varComp.test(full.mod, null=1L)
                 c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
               })
             } else {
-              withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+              withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv), offset = offset), warning = h)
               control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
               temp <- parSapply(cl, as.character(markers.out), function(x) {
                 m <- as.numeric(x)
-                full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+                full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, offset = offset)
                 test <- varComp.test(full.mod, null=c(1:length(qtl.vcv)))
                 c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
               })
@@ -202,11 +228,11 @@ optimize_qtl <- function(data, model, sig.bwd = 0.0001, polygenes = FALSE, n.clu
       }
     } # keeps refining until all QTL are significant
     #end backward
-
+    
     if(!is.null(plot)) dev.off()
     end <- proc.time()
     if(verbose) cat("  Calculation took", round((end - start)[3], digits = 2), "seconds\n\n")
-
+    
     if(length(qtl.mrk) > 0) {
       nqtl <- length(qtl.mrk)
       qtl <- c()
@@ -227,27 +253,29 @@ optimize_qtl <- function(data, model, sig.bwd = 0.0001, polygenes = FALSE, n.clu
     } else {
       qtls <- NULL
     } # output QTL
-
+    
     results[[p]] <- list(
       pheno.col=pheno.col,
       stat=stat,
       pval=pval,
       qtls=qtls)
-
+    
   }
-
+  
   stopCluster(cl)
-
+  
   structure(list(data=deparse(substitute(data)),
+                 offset.data=deparse(substitute(offset.data)),
                  pheno.col=model$pheno.col,
                  w.size=model$w.size,
                  sig.fwd=model$sig.fwd,
-                 sig.bwd=sig.bwd,
+                 sig.bwd=sig.bwd0,
+                 min.pvl=min.pvl,
                  polygenes=polygenes,
                  d.sint=NULL,
                  results=results),
             class=c("qtlpoly.model","qtlpoly.optimize"))
-
+  
 }
 
 #' @rdname optimize_qtl

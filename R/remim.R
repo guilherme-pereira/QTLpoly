@@ -12,6 +12,8 @@
 #'
 #' @param sig.bwd the desired score-based significance level for backward elimination, e.g. 0.001 (default).
 #'
+#' @param score.null an object of class \code{qtlpoly.null} with results of score statistics from resampling.
+#'
 #' @param d.sint a \eqn{d} value to subtract from logarithm of \emph{p}-value (\eqn{LOP-d}) for support interval calculation, e.g. \eqn{d=1.5} (default) represents approximate 95\% support interval.
 #'
 #' @param polygenes if \code{TRUE} all QTL already in the model are treated as a single polygenic effect; if \code{FALSE} (default) all QTL effect variances have to estimated.
@@ -62,29 +64,40 @@
 #' @references
 #'     Kao CH, Zeng ZB, Teasdale RD (1999) Multiple interval mapping for quantitative trait loci. \emph{Genetics} 152 (3): 1203–16. \url{www.genetics.org/content/152/3/1203}. 
 #' 
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
 #'     
-#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
+#'
+#'     Zou F, Fine JP, Hu J, Lin DY (2004) An efficient resampling method for assessing genome-wide statistical significance in mapping quantitative trait loci. \emph{Genetics} 168 (4): 2307-16. \url{doi.org/10.1534/genetics.104.031427}
 #'
 #' @export remim
 
-remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd = 0.001, d.sint = 1.5, polygenes = FALSE, n.clusters = NULL, n.rounds = Inf, plot = "remim", verbose = TRUE) {
-
+remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.20, sig.bwd = 0.05, score.null = NULL, d.sint = 1.5, polygenes = FALSE, n.clusters = NULL, n.rounds = Inf, plot = "remim", verbose = TRUE) {
+  
   if(is.null(n.clusters)) n.clusters <- 1
   cat("INFO: Using", n.clusters, "CPUs for calculation\n\n")
   cl <- makeCluster(n.clusters)
   clusterEvalQ(cl, require(varComp))
-
+  sig.fwd0 <- sig.fwd
+  sig.bwd0 <- sig.bwd
+  
+  min.pvl <- NULL
+  if(!is.null(score.null)) {
+    min.pvl <- numeric(length(score.null$results))
+    for(p in 1:length(score.null$results)) {
+      min.pvl[p] <- min(score.null$results[[p]]$pval)
+    }        
+  } 
+  
   if(is.null(pheno.col)) pheno.col <- 1:dim(data$pheno)[2]
   if(!is.null(plot)) plot <- paste(plot, "pdf", sep = ".")
   results <- vector("list", length(pheno.col))
   names(results) <- colnames(data$pheno)[pheno.col]
-  sig.fwd0 <- sig.fwd
-
+  
   for(p in 1:length(results)) {
-
+    
     round <- 1
-    w.size <- w.size/data$step
+    if(data$step > 1) w.size <- w.size/data$step
     stat <- numeric(data$nmrk)
     pval <- numeric(data$nmrk)
     start <- proc.time()
@@ -93,10 +106,11 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
     if(!is.null(plot)) pdf(paste(colnames(data$pheno)[pheno.col[p]], plot, sep = "_"))
     ind <- rownames(data$pheno)[which(!is.na(data$pheno[,pheno.col[p]]))]
     Y <- data$pheno[ind,pheno.col[p]]
+    if(!is.null(data$weights)) weight <- data$weights[ind,pheno.col[p]] else weight <- rep(1,length(ind))
     markers <- c(1:data$nmrk)
     temp <- parSapply(cl, as.character(markers), function(x) {
       m <- as.numeric(x)
-      full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]))
+      full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]), weights = weight/max(weight))
       test <- varComp.test(full.mod, null=integer(0L))
       c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
     }) #first search
@@ -109,7 +123,15 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
     qtl.lgr <- c()
     qtl.pos <- c()
     qtl.out0 <- c()
-
+    
+    if(!is.null(min.pvl)) {
+      sig.fwd <- quantile(sort(min.pvl), sig.fwd0); cat(sig.fwd, "\n")
+      sig.bwd <- quantile(sort(min.pvl), sig.bwd0); cat(sig.bwd, "\n")
+    } else {
+      sig.fwd <- sig.fwd0
+      sig.bwd <- sig.bwd0
+    }
+    
     if(temp["pv",which.max(temp["st",])] > sig.fwd) {
       qtl.mrk0 <- as.numeric(names(which.max(temp["st",])))
       qtl.lgr0 <- last(which(last(qtl.mrk0) > data$cum.nmrk))
@@ -118,7 +140,7 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
       stat[as.numeric(colnames(temp))] <- temp["st",]
       pval[as.numeric(colnames(temp))] <- temp["pv",]
     }
-
+    
     while(temp["pv",which.max(temp["st",])] <= sig.fwd & round < n.rounds & !any(as.numeric(names(which.max(temp["st",]))) == qtl.mrk)) { # QTL search while significant p-values
       while(temp["pv",which.max(temp["st",])] <= sig.fwd) {
         qtl.mrk <- c(qtl.mrk, as.numeric(names(which.max(temp["st",]))))
@@ -136,20 +158,20 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
         markers <- c(1:data$nmrk)[-markers.out]
         if(polygenes) {
           Gstar <- apply(data$G[ind,ind,qtl.mrk], MARGIN = c(1,2), sum)/length(qtl.mrk); Gstar[1:5,1:5]
-          full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar))
+          full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar), weights = weight/max(weight))
           control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
           temp <- parSapply(cl, as.character(markers), function(x) {
             m <- as.numeric(x)
-            full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control)
+            full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control, weights = weight/max(weight))
             test <- varComp.test(full.mod, null=1L)
             c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
           })
         } else {
-          withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+          withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv), weights = weight/max(weight)), warning = h)
           control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
           temp <- parSapply(cl, as.character(markers), function(x) {
             m <- as.numeric(x)
-            full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+            full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, weights = weight/max(weight))
             test <- varComp.test(full.mod, null=c(1:length(qtl.vcv)))
             c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
           })
@@ -182,7 +204,7 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
           markers.out <- c((data$cum.nmrk[qtl.lgr[1]]+1):(data$cum.nmrk[qtl.lgr[1]+1]))
           temp <- parSapply(cl, as.character(markers.out), function(x) { #like first search
             m <- as.numeric(x)
-            full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]))
+            full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]), weights = weight/max(weight))
             test <- varComp.test(full.mod, null=integer(0L))
             c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
           })
@@ -232,20 +254,20 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
               }
               if(polygenes) {
                 Gstar <- apply(data$G[ind,ind,qtl.mrk0], MARGIN = c(1,2), sum)/length(qtl.mrk0); Gstar[1:5,1:5]
-                full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar))
+                full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar), weights = weight/max(weight))
                 control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
                 temp <- parSapply(cl, as.character(markers.out), function(x) {
                   m <- as.numeric(x)
-                  full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control)
+                  full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control, weights = weight/max(weight))
                   test <- varComp.test(full.mod, null=1L)
                   c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
                 })
               } else {
-                withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+                withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv), weights = weight/max(weight)), warning = h)
                 control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
                 temp <- parSapply(cl, as.character(markers.out), function(x) {
                   m <- as.numeric(x)
-                  full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+                  full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, weights = weight/max(weight))
                   test <- varComp.test(full.mod, null=c(1:length(qtl.vcv)))
                   c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
                 })
@@ -288,14 +310,14 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
           if(any(abs(qtl.mrk1 - qtl.mrk) > w.size)) qtl.out <- c(1)
         }
       } # keeps refining until all QTL are significant
-
+      
       lower <- upper <- qtl.mrk
-
+      
       if(length(qtl.mrk) == 0) {
         markers <- c(1:data$nmrk)
         temp <- parSapply(cl, as.character(markers), function(x) { #like first search
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]))
+          full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]), weights = weight/max(weight))
           test <- varComp.test(full.mod, null=integer(0L))
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
@@ -306,25 +328,25 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
           abline(v=data$cum.nmrk, lty=3); abline(h=-log10(sig.bwd), lty=5)
         }
       } # completing genome when there's no QTL
-
+      
       if(length(qtl.mrk) == 1) {
         if(verbose) cat("  Profiling QTL ...", qtl.mrk, "\n")
         markers.out <- c((data$cum.nmrk[qtl.lgr[1]]+1):(data$cum.nmrk[qtl.lgr[1]+1]))
         markers <- c(1:data$nmrk)[-markers.out]
         temp <- parSapply(cl, as.character(markers.out), function(x) { #like first search
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]))
+          full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]), weights = weight/max(weight))
           test <- varComp.test(full.mod, null=integer(0L))
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
         stat[as.numeric(colnames(temp))] <- temp["st",]
         pval[as.numeric(colnames(temp))] <- temp["pv",]
         qtl.vcv <- list(data$G[ind,ind,qtl.mrk[1]])
-        withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+        withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv), weights = weight/max(weight)), warning = h)
         control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
         temp <- parSapply(cl, as.character(markers), function(x) { #markers outside chr with QTL (second search)
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+          full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, weights = weight/max(weight))
           test <- varComp.test(full.mod, null=1L)
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
@@ -341,7 +363,7 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
           upper[1] <- tail(markers.out[which(lop.out >= (lop.qtl - d.sint))],1)
         } # lower and upper markers for support interval
       } # profiling 1 QTL
-
+      
       if(length(qtl.mrk) > 1) {
         qtl.lgr <- qtl.lgr[order(qtl.mrk)]
         qtl.mrk <- sort(qtl.mrk)
@@ -371,37 +393,37 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
           }
           if(polygenes) {
             Gstar <- apply(data$G[ind,ind,qtl.mrk0], MARGIN = c(1,2), sum)/length(qtl.mrk0); Gstar[1:5,1:5]
-            full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar))
+            full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar), weights = weight/max(weight))
             control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
             temp <- parSapply(cl, as.character(markers.out), function(x) {
               m <- as.numeric(x)
-              full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control)
+              full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control, weights = weight/max(weight))
               test <- varComp.test(full.mod, null=1L)
               c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
             })
           } else {
-            withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+            withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv), weights = weight/max(weight)), warning = h)
             control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
             temp <- parSapply(cl, as.character(markers.out), function(x) {
               m <- as.numeric(x)
-              full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+              full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, weights = weight/max(weight))
               test <- varComp.test(full.mod, null=c(1:length(qtl.vcv)))
               c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
             })
           }
           stat[as.numeric(colnames(temp))] <- temp["st",]
           pval[as.numeric(colnames(temp))] <- temp["pv",]
-
+          
           qtl.mrk[q] <- markers.out[which.max(stat[markers.out])]
           qtl.pos[q] <- round(unlist(data$lgs)[qtl.mrk[q]], digits = 2)
-
+          
           if(!is.null(d.sint)) {
             lop.out <- -log10(pval[markers.out])
             lop.qtl <- -log10(pval[qtl.mrk[q]])
             lower[q] <- head(markers.out[which(lop.out >= (lop.qtl - d.sint))],1)
             upper[q] <- tail(markers.out[which(lop.out >= (lop.qtl - d.sint))],1)
           } # lower and upper markers for support interval
-
+          
           if(verbose) {
             cat("...", qtl.mrk[q], "")
             if(q == length(qtl.mrk)) cat("\n")
@@ -419,20 +441,20 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
           }
           if(polygenes) {
             Gstar <- apply(data$G[ind,ind,qtl.mrk], MARGIN = c(1,2), sum)/length(qtl.mrk); Gstar[1:5,1:5]
-            full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar))
+            full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar), weights = weight/max(weight))
             control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
             temp <- parSapply(cl, as.character(markers.out), function(x) {
               m <- as.numeric(x)
-              full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control)
+              full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control, weights = weight/max(weight))
               test <- varComp.test(full.mod, null=1L)
               c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
             })
           } else {
-            withCallingHandlers(full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+            withCallingHandlers(full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv), weights = weight/max(weight)), warning = h)
             control <- varComp.control(start = c(coef(full.mod, what = "var.ratio"),0))
             temp <- parSapply(cl, as.character(markers.out), function(x) {
               m <- as.numeric(x)
-              full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+              full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, weights = weight/max(weight))
               test <- varComp.test(full.mod, null=c(1:length(qtl.vcv)))
               c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
             })
@@ -445,20 +467,20 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
           }
         }
       } # profiling 1+ QTL
-
+      
       sig.fwd <- sig.bwd # sig.fwd is updated to the last sig.bwd
-
+      
       if(!is.null(qtl.out0) & !is.null(qtl.out1)) {
         if(qtl.out0 == qtl.out1) break
       } # breaks while if adds the same one excluded
       qtl.out0 <- qtl.out1
       round <- round + 1
     } # keeps doing forward, refinement and backward
-
+    
     if(!is.null(plot)) dev.off()
     end <- proc.time()
     if(verbose) cat("  Calculation took", round((end - start)[3], digits = 2), "seconds\n\n")
-
+    
     if(length(qtl.mrk) > 0) {
       nqtl <- length(qtl.mrk)
       qtl <- c()
@@ -498,24 +520,24 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
         lower[, c(2,5)] <- round(lower[, c(2,5)], digits = 2)
         lower[, c(6)] <- formatC(lower[, c(6)], format="e", digits = 2)
         if(any(lower[, c(6)] == "0.00e+00")) lower[which(lower[,6] == "0.00e+00"), c(6)] <- "<2.22e-16"
-
+        
         upper <- as.data.frame(matrix(upp, ncol=6, byrow=TRUE), stringsAsFactors=FALSE)
         colnames(upper) <- c("LG", "Pos_upper", "Nmrk_upper", "Mrk_upper", "Score_upper", "Pval_upper")
         upper[, c(1,2,3,5,6)] <- sapply(upper[, c(1,2,3,5,6)], as.numeric)
         upper[, c(2,5)] <- round(upper[, c(2,5)], digits = 2)
         upper[, c(6)] <- formatC(upper[, c(6)], format="e", digits = 2)
         if(any(upper[, c(6)] == "0.00e+00")) upper[which(upper[,6] == "0.00e+00"), c(6)] <- "<2.22e-16"
-
+        
       } else {
         lower <- upper <- NULL
       }
-
+      
     } else {
       qtls <- lower <- upper <- NULL
     } # output QTL plus support interval lower and upper bounds
-
-    sig.fwd <- sig.fwd0
-
+    
+    # sig.fwd <- sig.fwd0
+    
     results[[p]] <- list(
       pheno.col=pheno.col[p],
       stat=stat,
@@ -523,21 +545,22 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
       qtls=qtls,
       lower=lower,
       upper=upper)
-
+    
   }
-
+  
   stopCluster(cl)
-
+  
   structure(list(data=deparse(substitute(data)),
                  pheno.col=pheno.col,
                  w.size=w.size*data$step,
-                 sig.fwd=sig.fwd,
-                 sig.bwd=sig.bwd,
+                 sig.fwd=sig.fwd0,
+                 sig.bwd=sig.bwd0,
+                 min.pvl=min.pvl,
                  polygenes=polygenes,
                  d.sint=d.sint,
                  results=results),
             class=c("qtlpoly.model","qtlpoly.remim"))
-
+  
 }
 
 #' @rdname remim

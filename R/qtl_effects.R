@@ -1,6 +1,6 @@
 #' QTL allele effect estimation
 #'
-#' Computes allele specific and allele combination additive effects from multiple QTL models.
+#' Computes allele specific and allele combination (within-parent) heritable effects from multiple QTL models.
 #'
 #' @param ploidy a numeric value of ploidy level of the cross (currently, only 4 or 6).
 #'
@@ -51,44 +51,56 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
 #'
 #' @export qtl_effects
 
-qtl_effects <- function(ploidy = 6, fitted) {
-
-  results <- vector("list", length(fitted$results))
-  names(results) <- names(fitted$results)
-
+qtl_effects <- function(ploidy = 6, fitted, pheno.col = NULL, verbose = TRUE) {
+  
+  if(is.null(pheno.col)) pheno.col <- fitted$pheno.col
+  results <- vector("list", length(pheno.col))
+  names(results) <- names(fitted$results)[which(fitted$phenol %in% pheno.col)]
+  
   for(p in 1:length(results)) {
-
-    if(!is.null(fitted$results[[p]]$qtls)) {
-
-      nqtl <- dim(fitted$results[[p]]$qtls)[1]
+    
+    if(!is.null(fitted$results[[pheno.col[p]]]$qtls)) {
+      
+      nqtl <- dim(fitted$results[[pheno.col[p]]]$qtls)[1]
       if(nqtl > 1) nqtl <- nqtl - 1
       effects <- vector("list", nqtl)
-
+      qtl.mrk <- unlist(fitted$results[[pheno.col[p]]]$qtls[c(1:nqtl),"Nmrk"])
+      
+      if(verbose) {
+        if(length(qtl.mrk) == 1) cat("There is ", length(qtl.mrk), " QTL in the model for trait ", pheno.col[p], " ", sQuote(names(fitted$results)[pheno.col[p]]), ". Computing effects for QTL ", sep="")
+        if(length(qtl.mrk) >= 2) cat("There are ", length(qtl.mrk), " QTL in the model for trait ", pheno.col[p], " ", sQuote(names(fitted$results)[pheno.col[p]]), ". Computing effects for QTL ", sep="")
+      }
+      
       if(ploidy == 6) {
-
+        
         for(q in 1:nqtl) {
-
-          blups <- fitted$results[[p]]$fitted$u.hat[[q]]
+          
+          if(verbose) {
+            if(q < nqtl) cat("...", qtl.mrk[q], "")
+            if(q == nqtl) cat(paste0("... ", qtl.mrk[q]))
+          }
+          
+          blups <- fitted$results[[pheno.col[p]]]$fitted$u.hat[[q]]
           alleles <- matrix(unlist(strsplit(rownames(blups), '')), ncol=7, byrow=TRUE)[,-4]
-
+          
           A <- t(combn(letters[1:12],1))
           D <- t(combn(letters[1:12],2))
           T <- t(combn(letters[1:12],3))
           F <- t(combn(letters[1:12],4))
           G <- t(combn(letters[1:12],5))
           S <- t(combn(letters[1:12],6))
-
+          
           a <- vector("list", dim(A)[1])
           d <- vector("list", dim(D)[1])
           t <- vector("list", dim(T)[1])
           f <- vector("list", dim(F)[1])
           g <- vector("list", dim(G)[1])
           s <- vector("list", dim(S)[1])
-
+          
           for(i in 1:dim(A)[1]) {
             a[[i]] <- which(alleles == as.character(A[i,]), arr.ind = TRUE)[,1]
             a[[i]] <- mean(blups[Reduce(intersect, list(a[[i]]))])
@@ -119,32 +131,32 @@ qtl_effects <- function(ploidy = 6, fitted) {
             s[[i]] <- mean(blups[Reduce(intersect, list(s[[i]]))])
           }
           names(s) <- apply(S, 1, paste, collapse="")
-
+          
           a <- a[!is.nan(unlist(a))]
           d <- d[!is.nan(unlist(d))]
           t <- t[!is.nan(unlist(t))]
           f <- f[!is.nan(unlist(f))]
           g <- g[!is.nan(unlist(g))]
           s <- s[!is.nan(unlist(s))]
-
+          
           for(i in 1:length(d)) {
             d[[i]] <- d[[i]] -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(d), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           for(i in 1:length(t)) {
             t[[i]] <- t[[i]] -
               sum(unlist(d[which(lapply(lapply(strsplit(names(d), split = ""), function(x) intersect(strsplit(names(t), split = "")[[i]], x)), function(x) length(x) == 2) == TRUE)])) -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(t), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           for(i in 1:length(f)) {
             f[[i]] <- f[[i]] -
               sum(unlist(t[which(lapply(lapply(strsplit(names(t), split = ""), function(x) intersect(strsplit(names(f), split = "")[[i]], x)), function(x) length(x) == 3) == TRUE)])) -
               sum(unlist(d[which(lapply(lapply(strsplit(names(d), split = ""), function(x) intersect(strsplit(names(f), split = "")[[i]], x)), function(x) length(x) == 2) == TRUE)])) -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(f), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           for(i in 1:length(g)) {
             g[[i]] <- g[[i]] -
               sum(unlist(f[which(lapply(lapply(strsplit(names(f), split = ""), function(x) intersect(strsplit(names(g), split = "")[[i]], x)), function(x) length(x) == 4) == TRUE)])) -
@@ -152,7 +164,7 @@ qtl_effects <- function(ploidy = 6, fitted) {
               sum(unlist(d[which(lapply(lapply(strsplit(names(d), split = ""), function(x) intersect(strsplit(names(g), split = "")[[i]], x)), function(x) length(x) == 2) == TRUE)])) -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(g), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           for(i in 1:length(s)) {
             s[[i]] <- s[[i]] -
               sum(unlist(g[which(lapply(lapply(strsplit(names(g), split = ""), function(x) intersect(strsplit(names(s), split = "")[[i]], x)), function(x) length(x) == 5) == TRUE)])) -
@@ -161,29 +173,34 @@ qtl_effects <- function(ploidy = 6, fitted) {
               sum(unlist(d[which(lapply(lapply(strsplit(names(d), split = ""), function(x) intersect(strsplit(names(s), split = "")[[i]], x)), function(x) length(x) == 2) == TRUE)])) -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(s), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           effects[[q]] <- list(unlist(a), unlist(d), unlist(t), unlist(f), unlist(g), unlist(s))
-
+          
         }
       }
-
+      
       if(ploidy == 4) {
-
+        
         for(q in 1:nqtl) {
-
-          blups <- fitted$results[[p]]$fitted$u.hat[[q]]
+          
+          if(verbose) {
+            if(q < nqtl) cat("...", qtl.mrk[q], "")
+            if(q == nqtl) cat(paste0("... ", qtl.mrk[q]))
+          }
+          
+          blups <- fitted$results[[pheno.col[p]]]$fitted$u.hat[[q]]
           alleles <- matrix(unlist(strsplit(rownames(blups), '')), ncol=5, byrow=TRUE)[,-3]
-
+          
           A <- t(combn(letters[1:8],1))
           D <- t(combn(letters[1:8],2))
           T <- t(combn(letters[1:8],3))
           F <- t(combn(letters[1:8],4))
-
+          
           a <- vector("list", dim(A)[1])
           d <- vector("list", dim(D)[1])
           t <- vector("list", dim(T)[1])
           f <- vector("list", dim(F)[1])
-
+          
           for(i in 1:dim(A)[1]) {
             a[[i]] <- which(alleles == as.character(A[i,]), arr.ind = TRUE)[,1]
             a[[i]] <- mean(blups[Reduce(intersect, list(a[[i]]))])
@@ -204,52 +221,56 @@ qtl_effects <- function(ploidy = 6, fitted) {
             f[[i]] <- mean(blups[Reduce(intersect, list(f[[i]]))])
           }
           names(f) <- apply(F, 1, paste, collapse="")
-
+          
           a <- a[!is.nan(unlist(a))]
           d <- d[!is.nan(unlist(d))]
           t <- t[!is.nan(unlist(t))]
           f <- f[!is.nan(unlist(f))]
-
+          
           for(i in 1:length(d)) {
             d[[i]] <- d[[i]] -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(d), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           for(i in 1:length(t)) {
             t[[i]] <- t[[i]] -
               sum(unlist(d[which(lapply(lapply(strsplit(names(d), split = ""), function(x) intersect(strsplit(names(t), split = "")[[i]], x)), function(x) length(x) == 2) == TRUE)])) -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(t), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           for(i in 1:length(f)) {
             f[[i]] <- f[[i]] -
               sum(unlist(t[which(lapply(lapply(strsplit(names(t), split = ""), function(x) intersect(strsplit(names(f), split = "")[[i]], x)), function(x) length(x) == 3) == TRUE)])) -
               sum(unlist(d[which(lapply(lapply(strsplit(names(d), split = ""), function(x) intersect(strsplit(names(f), split = "")[[i]], x)), function(x) length(x) == 2) == TRUE)])) -
               sum(unlist(a[which(lapply(lapply(strsplit(names(a), split = ""), function(x) intersect(strsplit(names(f), split = "")[[i]], x)), function(x) length(x) == 1) == TRUE)]))
           }
-
+          
           effects[[q]] <- list(unlist(a), unlist(d), unlist(t), unlist(f))
-
+          
         }
-
+        
       }
-
+      
+      if(verbose) cat(". Done! \n\n", sep="")
+      
     } else {
+      
+      if(verbose) cat("There are no QTL in the model for trait ", pheno.col[p], " ", sQuote(names(fitted$results)[pheno.col[p]]), ". Skipping! \n\n", sep="")
       effects <- NULL
     }
-
+    
     results[[p]] <- list(
-      pheno.col=fitted$results[[p]]$pheno.col,
+      pheno.col=fitted$results[[pheno.col[p]]]$pheno.col,
       effects=effects)
-
+    
   }
-
+  
   structure(list(fitted=deparse(substitute(fitted)),
                  ploidy=ploidy,
                  pheno.col=fitted$pheno.col,
                  results=results),
             class="qtlpoly.effects")
-
+  
 }
 
 #' @rdname qtl_effects
@@ -268,7 +289,7 @@ plot.qtlpoly.effects <- function(x, pheno.col = NULL, p1 = "P1", p2 = "P2") {
       for(q in 1:nqtl) {
         if(x$ploidy == 4) {
           data <- unlist(x$results[[p]]$effects[[q]])[1:36]
-          data <- data.frame(Estimates=as.numeric(data), Alleles=names(data), Parent=c(rep(p1,4),rep(p2,4),rep(p1,14),rep(p2,14)), Effects=c(rep("Allelic",8),rep("Diallelic",28)))
+          data <- data.frame(Estimates=as.numeric(data), Alleles=names(data), Parent=c(rep(p1,4),rep(p2,4),rep(p1,14),rep(p2,14)), Effects=c(rep("Additive",8),rep("Digenic",28)))
           data <- data[-c(12:15,18:21,23:30),]
           # plot <- ggplot(data, aes(x = Alleles, y = Estimates, fill = Estimates)) +
           #   geom_bar(stat="identity") +
@@ -280,8 +301,9 @@ plot.qtlpoly.effects <- function(x, pheno.col = NULL, p1 = "P1", p2 = "P2") {
         }
         if(x$ploidy == 6) {
           data <- unlist(x$results[[p]]$effects[[q]])[-c(18:23,28:33,37:42,45:50,52:63,83:88,92:97,100:105,107:133,137:142,145:150,152:178,181:186,188:214,216:278,299:1763)]
-          data <- data.frame(Estimates=as.numeric(data), Alleles=names(data), Parent=c(rep(p1,6),rep(p2,6),rep(p1,15),rep(p2,15),rep(p1,20),rep(p2,20)), Effects=c(rep("Allelic",12),rep("Diallelic",30),rep("Triallelic",40)))
+          data <- data.frame(Estimates=as.numeric(data), Alleles=names(data), Parent=c(rep(p1,6),rep(p2,6),rep(p1,15),rep(p2,15),rep(p1,20),rep(p2,20)), Effects=c(rep("Additive",12),rep("Digenic",30),rep("Trigenic",40)))
         }
+        data$Parent <- factor(data$Parent, levels=unique(data$Parent))
         plot <- ggplot(data, aes(x = Alleles, y = Estimates, fill = Estimates)) +
           geom_bar(stat="identity") +
           scale_fill_gradient2(low = "red", high = "blue", guide = FALSE) +

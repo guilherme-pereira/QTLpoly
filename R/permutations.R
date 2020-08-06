@@ -48,12 +48,13 @@
 #' @references
 #'     Churchill GA, Doerge RW (1994) Empirical threshold values for quantitative trait mapping, \emph{Genetics} 138: 963-971. \url{http://www.genetics.org/content/138/3/963}
 #'
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
 #'
 #' @export permutations
 #' @import parallel
 
-permutations <- function(data, pheno.col = NULL, n.sim = 1000, probs = c(0.90, 0.95), n.clusters = 1, seed = 123, verbose = TRUE) {
+permutations <- function(data, offset.data = NULL, pheno.col = NULL, n.sim = 1000, probs = c(0.90, 0.95), n.clusters = NULL, seed = 123, verbose = TRUE) {
+  if(is.null(n.clusters)) n.clusters <- 1
   cat("INFO: Using", n.clusters, "CPUs for calculation\n\n")
   cl <- makeCluster(n.clusters)
   clusterSetRNGStream(cl, seed) # to make this reproducible
@@ -66,21 +67,21 @@ permutations <- function(data, pheno.col = NULL, n.sim = 1000, probs = c(0.90, 0
     start <- proc.time()
     if(verbose) cat("Permutations for trait", pheno.col[p], sQuote(colnames(data$pheno)[pheno.col[p]]), "\n")
     lod <- NULL
-    lod <- parCapply(cl, x, FUN=permuta, data=data, pheno.col=pheno.col, p=p)
+    lod <- parCapply(cl, x, FUN = permuta, data = data, offset.data = offset.data, pheno.col = pheno.col, p = p)
     results[[p]] <- lod
     if(verbose) cat("  ", last(probs)*100, "% LOD threshold = ", round(quantile(sort(lod), last(probs)), digits = 2), "\n", sep = "")
     end <- proc.time()
     if(verbose) cat("  Calculation took", round((end - start)[3], digits = 2), "seconds\n\n")
   }
-
+  
   stopCluster(cl)
-
+  
   sig.lod <- vector("list", length(probs))
   names(sig.lod) <- as.character(probs)
   for(i in 1:length(probs)) {
     sig.lod[[i]] <- unlist(lapply(results, FUN = function(x) quantile(sort(x), probs[i])))
   }
-                
+  
   structure(list(data=deparse(substitute(data)),
                  pheno.col=pheno.col,
                  n.sim=n.sim,
@@ -88,8 +89,8 @@ permutations <- function(data, pheno.col = NULL, n.sim = 1000, probs = c(0.90, 0
                  seed=seed,
                  results=results,
                  sig.lod=sig.lod
-                 ),
-            class=c("qtlpoly.perm"))
+  ),
+  class=c("qtlpoly.perm"))
 }
 
 #' @rdname permutations
@@ -108,7 +109,7 @@ print.qtlpoly.perm <- function(x, pheno.col=NULL, probs=c(0.90, 0.95)) {
   }
 }
 
-#' @rdname permutation
+#' @rdname permutations
 #' @import ggplot2
 #' @export
 
@@ -125,7 +126,7 @@ plot.qtlpoly.perm <- function(x, pheno.col=NULL, probs=c(0.90, 0.95)) {
         geom_histogram(bins = 15) +
         geom_vline(xintercept = quantile(data$LOD, probs), linetype="dashed") +
         annotate("text", x=quantile(data$LOD, probs), y=length(data$LOD)/6, angle=90, vjust=-0.1, hjust=0,
-                     label=paste(names(quantile(data$LOD, probs)), round(quantile(data$LOD, probs), digits = 2), sep=" = ")) +
+                 label=paste(names(quantile(data$LOD, probs)), round(quantile(data$LOD, probs), digits = 2), sep=" = ")) +
         labs(title=names(x$results)[p], y="Count", x="Maximum LOD scores") +
         theme_minimal() +
         theme(plot.title = element_text(hjust = 0.5), title=element_text(face="bold"))
@@ -142,13 +143,18 @@ plot.qtlpoly.perm <- function(x, pheno.col=NULL, probs=c(0.90, 0.95)) {
 #' @param p the phenotype column number to be evaluated
 #' @keywords internal
 #' @export
-permuta <- function(x, data=data, pheno.col=pheno.col, p=p) {
+permuta <- function(x, data = data, offset.data = offset.data, pheno.col = pheno.col, p = p) {
   ind <- which(dimnames(data$pheno)[[1]] %in% dimnames(data$X)[[1]])
   LRT <- numeric(data$nmrk)
   Y <- sample(data$pheno[ind,pheno.col[p]])
+  if(is.null(offset.data)) {
+    offset <- NULL
+  } else {
+    offset <- offset.data[names(Y),pheno.col[p]]
+  }
   for(m in 1:data$nmrk) {
-    full.mod <- lm(Y ~ 1 + data$X[ind,-c(1,(data$ploidy+1)),m])
-    null.mod <- lm(full.mod$model$Y ~ 1)
+    full.mod <- lm(Y ~ 1 + data$X[ind,-c(1,(data$ploidy+1)),m], offset = offset[names(Y)])
+    null.mod <- lm(Y ~ 1, offset = offset[names(Y)])
     LRT[m] <- -2 * (logLik(null.mod) - logLik(full.mod))
   }
   LOD <- LRT/(2*log(10))

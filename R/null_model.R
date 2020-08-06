@@ -4,6 +4,8 @@
 #'
 #' @param data an object of class \code{qtlpoly.data}.
 #'
+#' @param offset.data a data frame with the same dimensions of \code{data$pheno} containing offset variables; if \code{NULL} (default), no offset variables are considered.
+#' 
 #' @param pheno.col a numeric vector with the phenotype columns to be analyzed; if \code{NULL}, all phenotypes from \code{'data'} will be included.
 #'
 #' @param n.clusters number of parallel processes to spawn.
@@ -43,39 +45,44 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
 #'     
-#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
 #'
 #' @export null_model
 #' @import varComp parallel
 
-null_model <- function(data, pheno.col = NULL, n.clusters = NULL, plot = "null", verbose = TRUE) {
-
+null_model <- function(data, offset.data = NULL, pheno.col = NULL, n.clusters = NULL, plot = "null", verbose = TRUE) {
+  
   if(is.null(n.clusters)) n.clusters <- 1
   cat("INFO: Using", n.clusters, "CPUs for calculation\n\n")
   cl <- makeCluster(n.clusters)
   clusterEvalQ(cl, require(varComp))
-
+  
   if(is.null(pheno.col)) pheno.col <- 1:dim(data$pheno)[2]
   if(!is.null(plot)) plot <- paste(plot, "pdf", sep = ".")
   results <- vector("list", length(pheno.col))
   names(results) <- colnames(data$pheno)[pheno.col]
-
+  
   for(p in 1:length(results)) {
-
+    
     start <- proc.time()
     stat <- numeric(data$nmrk)
     pval <- numeric(data$nmrk)
     ind <- rownames(data$pheno)[which(!is.na(data$pheno[,pheno.col[p]]))]
     Y <- data$pheno[ind,pheno.col[p]]
+    if(is.null(offset.data)) {
+      offset <- NULL
+    } else {
+      offset <- offset.data[ind,pheno.col[p]]
+    }
     if(verbose) cat("Null model for trait", pheno.col[p], sQuote(colnames(data$pheno)[pheno.col[p]]), "\n")
     if(!is.null(plot)) pdf(paste(colnames(data$pheno)[pheno.col[p]], plot, sep = "_"))
-
+    
     markers <- c(1:data$nmrk)
     temp <- parSapply(cl, as.character(markers), function(x) {
       m <- as.numeric(x)
-      full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]))
+      full.mod <- varComp(Y ~ 1, varcov = list(data$G[ind,ind,m]), offset = offset)
       test <- varComp.test(full.mod, null=integer(0L))
       c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
     })
@@ -86,22 +93,23 @@ null_model <- function(data, pheno.col = NULL, n.clusters = NULL, plot = "null",
     }
     stat[as.numeric(colnames(temp))] <- temp["st",]
     pval[as.numeric(colnames(temp))] <- temp["pv",]
-
+    
     results[[p]] <- list(
       pheno.col=pheno.col[p],
       stat=stat,
       pval=pval,
       qtls=NULL)
-
+    
     if(!is.null(plot)) dev.off()
     end <- proc.time()
     if(verbose) cat("  Calculation took", round((end - start)[3], digits = 2), "seconds\n\n")
-
+    
   }
-
+  
   stopCluster(cl)
-
+  
   structure(list(data=deparse(substitute(data)),
+                 offset.data=deparse(substitute(offset.data)),
                  pheno.col=pheno.col,
                  w.size=NULL,
                  sig.fwd=NULL,
@@ -110,7 +118,7 @@ null_model <- function(data, pheno.col = NULL, n.clusters = NULL, plot = "null",
                  d.sint=NULL,
                  results=results),
             class=c("qtlpoly.model","qtlpoly.null"))
-
+  
 }
 
 #' @rdname null_model

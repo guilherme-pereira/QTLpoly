@@ -4,11 +4,15 @@
 #'
 #' @param data an object of class \code{qtlpoly.data}.
 #'
+#' @param offset.data a data frame with the same dimensions of \code{data$pheno} containing offset variables; if \code{NULL} (default), no offset variables are considered.
+#' 
 #' @param model an object of class \code{qtlpoly.model} from which a forward search will start.
 #'
 #' @param w.size the window size (in cM) to avoid on either side of QTL already in the model when looking for a new QTL.
 #'
 #' @param sig.fwd the desired score-based \emph{p}-value threshold for forward search, e.g. 0.01 (default).
+#'
+#' @param score.null an object of class \code{qtlpoly.null} with results of score statistics from resampling.
 #'
 #' @param polygenes if \code{TRUE} all QTL but the one being tested are treated as a single polygenic effect; if \code{FALSE} (default) all QTL effect variances have to estimated.
 #'
@@ -57,31 +61,56 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
 #'     
-#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+#'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
+#'
+#'     Zou F, Fine JP, Hu J, Lin DY (2004) An efficient resampling method for assessing genome-wide statistical significance in mapping quantitative trait loci. \emph{Genetics} 168 (4): 2307-16. \url{doi.org/10.1534/genetics.104.031427}
 #'
 #' @export search_qtl
 
-search_qtl <- function(data, model, w.size = 15, sig.fwd = 0.01, polygenes = FALSE, n.rounds = Inf, n.clusters = NULL, plot = "search", verbose = TRUE) {
-
+search_qtl <- function(data, offset.data = NULL, model, w.size = 15, sig.fwd = 0.20, score.null = NULL, polygenes = FALSE, n.rounds = Inf, n.clusters = NULL, plot = "search", verbose = TRUE) {
+  
   if(is.null(n.clusters)) n.clusters <- 1
   cat("INFO: Using", n.clusters, "CPUs for calculation\n\n")
   cl <- makeCluster(n.clusters)
   clusterEvalQ(cl, require(varComp))
-
+  
+  sig.fwd0 <- sig.fwd
+  
+  min.pvl <- NULL
+  if(!is.null(score.null)) {
+    min.pvl <- numeric(length(score.null$results))
+    for(p in 1:length(score.null$results)) {
+      min.pvl[p] <- min(score.null$results[[p]]$pval)
+    }        
+  } # else if(!is.null(model$min.pvl)) {
+  #   min.pvl <- model$min.pvl
+  # }
+  
   if(!is.null(plot)) plot <- paste(plot, "pdf", sep = ".")
   results <- vector("list", length(model$results))
   names(results) <- names(model$results)
-  w.size <- w.size/data$step
-
+  if(data$step >= 1) w.size <- w.size/data$step
+  
   for(p in 1:length(results)) {
-
+    
+    if(!is.null(min.pvl)) {
+      sig.fwd <- quantile(sort(min.pvl), sig.fwd0)#; cat(sig.fwd, "\n")
+    } else {
+      sig.fwd <- sig.fwd0
+    }
+    
     round <- 1
     start <- proc.time()
     pheno.col <- model$results[[p]]$pheno.col
     ind <- rownames(data$pheno)[which(!is.na(data$pheno[,pheno.col]))]
     Y <- data$pheno[ind,pheno.col]
+    if(is.null(offset.data)) {
+      offset <- NULL
+    } else {
+      offset <- offset.data[ind,pheno.col]
+    }
     stat <- model$results[[p]]$stat
     pval <- model$results[[p]]$pval
     temp <- rbind(st = stat, pv = pval)
@@ -113,20 +142,20 @@ search_qtl <- function(data, model, w.size = 15, sig.fwd = 0.01, polygenes = FAL
       markers <- c(1:data$nmrk)[-markers.out]
       if(polygenes) {
         Gstar <- apply(data$G[ind,ind,qtl.mrk], MARGIN = c(1,2), sum)/length(qtl.mrk); Gstar[1:5,1:5]
-        full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar))
+        full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar), offset = offset)
         control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
         temp <- parSapply(cl, as.character(markers), function(x) {
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control)
+          full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control, offset = offset)
           test <- varComp.test(full.mod, null=1L)
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
       } else {
-        withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+        withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv), offset = offset), warning = h)
         control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
         temp <- parSapply(cl, as.character(markers), function(x) {
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+          full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, offset = offset)
           test <- varComp.test(full.mod, null=c(1:length(qtl.vcv)))
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
@@ -136,7 +165,7 @@ search_qtl <- function(data, model, w.size = 15, sig.fwd = 0.01, polygenes = FAL
         abline(v=data$cum.nmrk, lty=3); abline(h=-log10(sig.fwd), lty=5); points(x=qtl.mrk, y=rep(-0.15, length(qtl.mrk)), pch=6, lwd=1.5, col="red")
       }
     }
-
+    
     while(temp["pv",which.max(temp["st",])] <= sig.fwd & round < n.rounds) {
       round <- round + 1
       qtl.mrk <- c(qtl.mrk,  as.numeric(names(which.max(temp["st",]))))
@@ -154,20 +183,20 @@ search_qtl <- function(data, model, w.size = 15, sig.fwd = 0.01, polygenes = FAL
       markers <- c(1:data$nmrk)[-markers.out]
       if(polygenes) {
         Gstar <- apply(data$G[ind,ind,qtl.mrk], MARGIN = c(1,2), sum)/length(qtl.mrk); Gstar[1:5,1:5]
-        full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar))
+        full.mod0 <- varComp(Y ~ 1, varcov = list(Gstar), offset = offset)
         control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
         temp <- parSapply(cl, as.character(markers), function(x) {
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control)
+          full.mod <- varComp(Y ~ 1, varcov = list(Gstar, data$G[ind,ind,m]), control = control, offset = offset)
           test <- varComp.test(full.mod, null=1L)
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
       } else {
-        withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv)), warning = h)
+        withCallingHandlers(full.mod0 <- varComp(Y ~ 1, varcov = c(qtl.vcv), offset = offset), warning = h)
         control <- varComp.control(start = c(coef(full.mod0, what = "var.ratio"),0))
         temp <- parSapply(cl, as.character(markers), function(x) {
           m <- as.numeric(x)
-          full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control)
+          full.mod <- varComp(Y ~ 1, varcov = c(qtl.vcv, list(data$G[ind,ind,m])), control = control, offset = offset)
           test <- varComp.test(full.mod, null=c(1:length(qtl.vcv)))
           c(st=as.numeric(test[[1]][[1]][[1]]$statistic), pv=as.numeric(test[[1]][[1]][[1]]$p.value))
         })
@@ -178,25 +207,25 @@ search_qtl <- function(data, model, w.size = 15, sig.fwd = 0.01, polygenes = FAL
         abline(v=data$cum.nmrk, lty=3); abline(h=-log10(sig.fwd), lty=5); points(x=qtl.mrk, y=rep(-0.15, length(qtl.mrk)), pch=6, lwd=1.5, col="red")
       }
     } # QTL search while significant p-values: forward search
-
+    
     qtl.mrk0 <- as.numeric(names(which.max(temp["st",])))
     qtl.lgr0 <- last(which(last(qtl.mrk0) > data$cum.nmrk))
     qtl.pos0 <- round(unlist(data$lgs)[[qtl.mrk0]], digits = 2)
     if(!is.null(qtl.mrk) & verbose) cat("  No more QTL were found. A putative QTL on LG ", last(qtl.lgr0), " at ", last(qtl.pos0), " cM (position number ", last(qtl.mrk0), ") did not reach the threshold; its p-value was ", round(temp["pv",][which.max(temp["st",])], 5), "\n", sep="")
     stat[as.numeric(colnames(temp))] <- temp["st",]
     pval[as.numeric(colnames(temp))] <- temp["pv",]
-
+    
     if(is.null(qtl.mrk)) {
       qtl.mrk0 <- which.max(stat)
       qtl.lgr0 <- last(which(last(qtl.mrk0) > data$cum.nmrk))
       qtl.pos0 <- round(unlist(data$lgs)[[last(qtl.mrk0)]], digits = 2)
       if(verbose) cat("  No QTL were found. A putative QTL on LG ", last(qtl.lgr0), " at ", last(qtl.pos0), " cM (position number ", last(qtl.mrk0), ") did not reach the threshold; its p-value was ", round(temp["pv",][which.max(temp["st",])], 5), "\n", sep="")
     }
-
+    
     if(!is.null(plot)) dev.off()
     end <- proc.time()
     if(verbose) cat("  Calculation took", round((end - start)[3], digits = 2), "seconds\n\n")
-
+    
     if(length(qtl.mrk) > 0) {
       nqtl <- length(qtl.mrk)
       qtl <- c()
@@ -217,27 +246,29 @@ search_qtl <- function(data, model, w.size = 15, sig.fwd = 0.01, polygenes = FAL
     } else {
       qtls <- NULL
     }
-
+    
     results[[p]] <- list(
       pheno.col=pheno.col,
       stat=stat,
       pval=pval,
       qtls=qtls)
-
+    
   }
-
+  
   stopCluster(cl)
-
+  
   structure(list(data=deparse(substitute(data)),
+                 offset.data=deparse(substitute(offset.data)),
                  pheno.col=model$pheno.col,
                  w.size=w.size,
-                 sig.fwd=sig.fwd,
+                 sig.fwd=sig.fwd0,
                  sig.bwd=NULL,
+                 min.pvl=min.pvl,
                  polygenes=polygenes,
                  d.sint=NULL,
                  results=results),
             class=c("qtlpoly.model","qtlpoly.search"))
-
+  
 }
 
 #' @rdname search_qtl
