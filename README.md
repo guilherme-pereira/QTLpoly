@@ -7,7 +7,7 @@ The R package `qtlpoly` (v. 0.1-0) is an under development software to map quant
 
 In order to do so, you will need a genetic map from which conditional probabilities of putative QTL can be computed. We recommend [`mappoly`](https://github.com/mmollina/MAPpoly), a hidden Markov model-based R package to construct genetic maps in autopolyploids (Mollinari and Garcia 2019).
 
-Variance components associated with putative QTL are tested using score statistics from the R package `varComp` (v. 0.2-0) (Qu et al. 2013). Final models are fitted using residual maximum likelihood (REML) from the R package `sommer` (v. 3.6) (Covarrubias-Pazaran 2016). Plots for visualizing the results are based on `ggplot2` (v. 3.1.0) (Wickham 2016). 
+Variance components associated with putative QTL are tested using score statistics from the R package `varComp` (v. 0.2-0) (Qu et al. 2013). Final models are fitted using residual maximum likelihood (REML) from the R package `sommer` (v. 3.6) (Covarrubias-Pazaran 2016). Plots for visualizing the results are based on `ggplot2` (v. 3.3.2) (Wickham 2016). 
 
 ## Install `qtlpoly` package
 
