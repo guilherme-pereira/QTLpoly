@@ -29,6 +29,7 @@ Do not update `sommer` to the most recent version even if R asks you to do so wh
 Tutorials as well as simulated and real data set analyses will be listed here opportunately in order to help users to get familiar with the software and allow them to perform their own analyses:
 
 1. [Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly](https://guilherme-pereira.github.io/QTLpoly/1-tutorial)
+2. Score-based resampling method to assess genome-wide significance
 
 ## Acknowledgments
 
@@ -40,7 +41,7 @@ Covarrubias-Pazaran G. 2016. “Genome-assisted prediction of quantitative trait
 
 Mollinari M, Garcia AAF. 2019. “Linkage analysis and haplotype phasing in experimental autopolyploid populations with high ploidy level using hidden Markov models.” G3: Genes, Genomes, Genetics 9 (10): 3297-3314. [doi:10.1534/g3.119.400378](https://doi.org/10.1534/g3.119.400378).
 
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB. 2020. “Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population.” Genetics (early online). [doi:10.1534/genetics.120.303080](https://doi.org/10.1534/genetics.120.303080).
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB. 2020. “Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population.” Genetics 215 (3): 579-595. [doi:10.1534/genetics.120.303080](https://doi.org/10.1534/genetics.120.303080).
 
 Qu L, Guennel T, Marshall SL. 2013. “Linear score tests for variance components in linear mixed models and applications to genetic association studies.” Biometrics 69 (4): 883-892. [doi:10.1111/biom.12095](https://doi.org/10.1111/biom.12095).
 
