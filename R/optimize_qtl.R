@@ -79,6 +79,7 @@ optimize_qtl <- function(data, offset.data = NULL, model, sig.bwd = 0.05, score.
   
   sig.bwd0 <- sig.bwd
   
+  min.pvl <- NULL
   if(!is.null(score.null)) {
     min.pvl <- numeric(length(score.null$results))
     for(p in 1:length(score.null$results)) {
@@ -86,7 +87,7 @@ optimize_qtl <- function(data, offset.data = NULL, model, sig.bwd = 0.05, score.
     }        
   } else if(!is.null(model$min.pvl)) {
     min.pvl <- model$min.pvl
-  }
+  } 
   
   if(!is.null(plot)) plot <- paste(plot, "pdf", sep = ".")
   results <- vector("list", length(model$results))
