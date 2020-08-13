@@ -111,10 +111,10 @@ plot_profile <- function(data = data, model = model, pheno.col = NULL, main = NU
     geom_line(data=lines, aes(y = SIG, color = TRT), size=1, alpha=0.8, lineend = "round") +
     geom_point(data=map, aes(y=0, x=POS), shape="|", alpha=200/dim(map)[1]) +
     {if(nrow(points) > 0) geom_point(data=points, aes(y = y.dat, color = TRT), shape = 2, size = 2, stroke = 1, alpha = 0.8)} +
-    scale_x_continuous(breaks=seq(0,max(data$lgs.size),cutx), expand = expand_scale(add=50)) +
+    scale_x_continuous(breaks=seq(0,max(data$lgs.size),cutx), expand = expansion(add=50)) +
     # {if(!is.null(ylim)) scale_y_continuous(limits = ylim) else scale_y_continuous(limits = c(min(y.dat), 10))} +
     {if(!is.null(ylim)) scale_y_continuous(limits = c(min(y.dat), ylim[2]))} +
-    {if(grid) scale_y_continuous(breaks = seq(0, max(lines$SIG), cuty), expand = expand_scale(add=c(0.5, 0.5)))} +
+    {if(grid) scale_y_continuous(breaks = seq(0, max(lines$SIG), cuty), expand = expansion(add=c(0.5, 0.5)))} +
     # {if(grid) scale_y_continuous(breaks = seq(0, max(lines$SIG), cuty), expand = c(0.05,0.15))} +
     # {if((!is.null(ylim) & length(pheno.col) == 1) | (!is.null(ylim) & !grid)) scale_y_continuous(limits = ylim)} +
     {if(nrow(thre) > 0) geom_hline(data=thre, aes(yintercept=SIG, color=TRT), linetype="dashed", size=.5, alpha=0.8)} + #threshold

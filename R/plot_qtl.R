@@ -105,7 +105,7 @@ plot_qtl <- function(data=data, model=model, fitted=fitted, pheno.col=NULL, main
     scale_color_gradient(trans = "log10") +
     scale_radius(range=c(1, 5)) +
     labs(title=main, subtitle = "Linkage group", y = "Trait", x = "Position (cM)", col=expression(paste(italic(P), "-value", sep="")), size=expression(italic(h)[QTL]^{2}))+
-    scale_x_continuous(breaks = seq(0, max(data$cum.size), 100), expand = expand_scale(add = 50)) +
+    scale_x_continuous(breaks = seq(0, max(data$cum.size), 100), expand = expansion(add = 50)) +
     theme_bw() +
     theme(axis.text.x = element_text(angle=45, hjust=1), panel.spacing = unit(0, "lines"), plot.subtitle = element_text(hjust = 0.5))          
   # suppressWarnings({
