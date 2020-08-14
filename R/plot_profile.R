@@ -96,14 +96,14 @@ plot_profile <- function(data = data, model = model, pheno.col = NULL, main = NU
     y.lab <- "LOP"
   }
   if(is.null(y.dat)) y.dat <- ylim[1]
-  if(grid) y.dat <- -max(lines$SIG)/10
+  if(grid) y.dat <- -max(lines$SIG[is.finite(lines$SIG)])/10
   
   for(c in 1:data$nlgs) {
     LGS <- rep(c, length(data$lgs.all[[c]]))
     map <- rbind(map, data.frame(LGS=LGS, POS=data$lgs.all[[c]]))
   }
   if(max(data$lgs.size) > 200) cutx <- 150 else cutx <- 100
-  if(max(lines$SIG) < 7) cuty <- 2 else cuty <- 4
+  if(max(lines$SIG[is.finite(lines$SIG)])) cuty <- 2 else cuty <- 4
   
   pl <- ggplot(data = lines, aes(x = POS)) +
     {if(grid) facet_grid(TRT ~ LGS, scales = "free", space = "free", shrink = TRUE) else facet_grid(~ LGS, scales = "free_x", space = "free_x")} +
@@ -114,7 +114,7 @@ plot_profile <- function(data = data, model = model, pheno.col = NULL, main = NU
     scale_x_continuous(breaks=seq(0,max(data$lgs.size),cutx), expand = expansion(add=50)) +
     # {if(!is.null(ylim)) scale_y_continuous(limits = ylim) else scale_y_continuous(limits = c(min(y.dat), 10))} +
     {if(!is.null(ylim)) scale_y_continuous(limits = c(min(y.dat), ylim[2]))} +
-    {if(grid) scale_y_continuous(breaks = seq(0, max(lines$SIG), cuty), expand = expansion(add=c(0.5, 0.5)))} +
+    {if(grid) scale_y_continuous(breaks = seq(0, max(lines$SIG[is.finite(lines$SIG)]), cuty), expand = expansion(add=c(0.5, 0.5)))} +
     # {if(grid) scale_y_continuous(breaks = seq(0, max(lines$SIG), cuty), expand = c(0.05,0.15))} +
     # {if((!is.null(ylim) & length(pheno.col) == 1) | (!is.null(ylim) & !grid)) scale_y_continuous(limits = ylim)} +
     {if(nrow(thre) > 0) geom_hline(data=thre, aes(yintercept=SIG, color=TRT), linetype="dashed", size=.5, alpha=0.8)} + #threshold
