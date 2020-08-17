@@ -39,7 +39,7 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
 #'
 #' @export plot_sint
 #' @import ggplot2
@@ -51,7 +51,7 @@ plot_sint <- function(data, model, pheno.col=NULL, main=NULL, drop=FALSE) {
   lower <- c(rep(0, data$nlgs))
   pos <- c(rep(-10, data$nlgs))
   upper <- c(data$lgs.size)
-
+  
   if(is.null(pheno.col)) pheno.col <- model$pheno.col
   nphen <- length(pheno.col)
   for(p in 1:nphen) {
@@ -73,7 +73,7 @@ plot_sint <- function(data, model, pheno.col=NULL, main=NULL, drop=FALSE) {
       upper <- c(upper, c(rep(-10, data$nlgs)))
     }
   }
-
+  
   DF <- data.frame(trait=trait, lg=as.integer(lg), lg.lab=lg.lab, lower=lower, pos=pos, upper=upper)
   DF$trait <- factor(DF$trait, levels = unique(DF$trait))
   DF$lg <- factor(DF$lg, levels = unique(DF$lg))
@@ -81,39 +81,21 @@ plot_sint <- function(data, model, pheno.col=NULL, main=NULL, drop=FALSE) {
   bxp.table <- table(interaction(DF$trait, DF$lg))
   bxp.width <- c(bxp.table[unlist(lapply(interaction(DF$trait, DF$lg), function(x) which(names(bxp.table) %in% x)))])
   bxp.width <- ifelse(bxp.width == 1, 1, bxp.width-.25)
-
+  
   suppressWarnings({
-  ggplot(data = DF) +
-  facet_grid(~ lg, scales = "free_x", space = "free_x") +
-    geom_boxplot(aes(x=trait, ymin = lower, lower = lower, middle = pos, upper = upper, ymax = upper, color=trait, fill = trait, group = interaction(trait, pos)), position = position_dodge(0), stat="identity", size = 0, width = bxp.width) +
-    geom_crossbar(aes(x=trait, y=pos, ymin = -10, ymax = -10), width = 1, position=position_dodge(0)) +
-    scale_fill_manual(values = trait.color) +
-    scale_color_manual(values = trait.color) +
-    coord_cartesian(ylim = c(max(upper), 5)) +
-    labs(title=main, x = "Linkage Group", y = "Position (cM)")+
-    scale_x_discrete(position="top") +
-    scale_y_reverse(expand = c(0,8)) +
-    theme(legend.title=element_blank(), axis.text.x=element_blank(), legend.position="bottom",
-          title=element_text(face="bold"), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), axis.ticks.x=element_blank(),
-          panel.spacing = unit(0.2, "lines"), strip.text.x = element_text(size = 10), plot.title = element_text(face="bold", hjust = 0.5))
+    ggplot(data = DF) +
+      facet_grid(~ lg, scales = "free_x", space = "free_x") +
+      geom_boxplot(aes(x=trait, ymin = lower, lower = lower, middle = pos, upper = upper, ymax = upper, color=trait, fill = trait, group = interaction(trait, pos)), position = position_dodge(0), stat="identity", size = 0, width = bxp.width) +
+      geom_crossbar(aes(x=trait, y=pos, ymin = -10, ymax = -10), width = 1, position=position_dodge(0)) +
+      scale_fill_manual(values = trait.color) +
+      scale_color_manual(values = trait.color) +
+      coord_cartesian(ylim = c(max(upper), 5)) +
+      labs(title=main, x = "Linkage Group", y = "Position (cM)")+
+      scale_x_discrete(position="top") +
+      scale_y_reverse(expand = c(0,8)) +
+      theme_bw() +
+      theme(legend.title=element_blank(), axis.text.x=element_blank(), legend.position="bottom",
+            title=element_text(face="bold"), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), axis.ticks.x=element_blank(),
+            panel.spacing = unit(0.2, "lines"), strip.text.x = element_text(size = 10), plot.title = element_text(face="bold", hjust = 0.5))
   })
-
-
-  # ggplot(DF, aes(x = lg, ymin = lower, lower = lower, middle = pos, upper = upper, ymax = upper, group = interaction(trait, lg))) +
-  #   geom_boxplot(aes(color=trait, fill = trait), position = position_dodge(1), stat="identity", size = 0) +
-  #   geom_crossbar(aes(y=pos, ymin = -10, ymax = -10), width = 1, position=position_dodge(1)) +
-  #   scale_fill_manual(values = trait.color) +
-  #   scale_color_manual(values = trait.color) +
-  #   coord_cartesian(ylim = c(max(upper)+9,0)) +
-  #   labs(x = "Linkage Groups", y = "Length (cM)") +
-  #   # scale_x_discrete(breaks=lg-1, labels = lg, position = "top") +
-  #   # scale_x_continuous(limits=c(0,12), breaks = lg, labels = lg.lab, position = "top") +
-  #   # scale_x_continuous(breaks = c(unique(lg)-(p/10)), labels = c(unique(lg)), position = "top") +
-  #   scale_x_discrete(position="top") +
-  #   scale_y_reverse(expand = c(0,9)) +
-  #   # theme_minimal() +
-  #   geom_text(aes(x = lg, y = lower, label=lg.lab), position = position_dodge(1), vjust = -0.5) +
-  #   theme(legend.title=element_blank(), legend.text = element_text(size=10), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold")) +
-  #   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
-
 }

@@ -51,7 +51,7 @@
 #' @export plot_qtl
 #' @import ggplot2
 
-plot_qtl <- function(data=data, model=model, fitted=fitted, pheno.col=NULL, main=NULL, drop.pheno=FALSE, drop.lgs=FALSE) {
+plot_qtl <- function(data=data, model=model, fitted=fitted, pheno.col=NULL, main=NULL, drop.pheno=TRUE, drop.lgs=TRUE) {
   trt <- c()
   lgs <- c()
   pos <- c()
@@ -69,18 +69,18 @@ plot_qtl <- function(data=data, model=model, fitted=fitted, pheno.col=NULL, main
     if(!is.null(nqtl)) {
       trt <- c(trt, rep(names(model$results)[[t]], nqtl))
       lgs <- c(lgs, unlist(model$results[[t]]$qtls[1:nqtl,1]))
-      # pos <- c(pos, unlist(model$results[[t]]$qtls[1:nqtl,2])+data$cum.size[unlist(model$results[[t]]$qtls[1:nqtl,1])])
       pos <- c(pos, unlist(model$results[[t]]$qtls[1:nqtl,2]))
       pvl <- c(pvl, pvls)
       h2q <- c(h2q, unlist(fitted$results[[t]]$qtls[1:nqtl,7]))
     } else if(!drop.pheno) {
       trt <- c(trt, names(model$results)[[t]])
-      lgs <- c(lgs, lgs[1])
+      lgs <- c(lgs, NA)
       pos <- c(pos, 0)
       pvl <- c(pvl, NA)
       h2q <- c(h2q, NA)
     }
   }
+  lgs[which(is.na(lgs))] <- lgs[which(!is.na(lgs))][1]
   if(!drop.lgs) {
     trt <- c(trt, rep(trt[1], 2*data$nlgs))
     lgs <- c(lgs, c(1:data$nlgs), c(1:data$nlgs))
@@ -105,7 +105,7 @@ plot_qtl <- function(data=data, model=model, fitted=fitted, pheno.col=NULL, main
     scale_color_gradient(trans = "log10") +
     scale_radius(range=c(1, 5)) +
     labs(title=main, subtitle = "Linkage group", y = "Trait", x = "Position (cM)", col=expression(paste(italic(P), "-value", sep="")), size=expression(italic(h)[QTL]^{2}))+
-    scale_x_continuous(breaks = seq(0, max(data$cum.size), 100), expand = expansion(add = 50)) +
+    scale_x_continuous(breaks = seq(0, max(data$cum.size), 100), expand = expand_scale(add = 50)) +
     theme_bw() +
     theme(axis.text.x = element_text(angle=45, hjust=1), panel.spacing = unit(0, "lines"), plot.subtitle = element_text(hjust = 0.5))          
   # suppressWarnings({
