@@ -105,26 +105,7 @@ plot_qtl <- function(data=data, model=model, fitted=fitted, pheno.col=NULL, main
     scale_color_gradient(trans = "log10") +
     scale_radius(range=c(1, 5)) +
     labs(title=main, subtitle = "Linkage group", y = "Trait", x = "Position (cM)", col=expression(paste(italic(P), "-value", sep="")), size=expression(italic(h)[QTL]^{2}))+
-    scale_x_continuous(breaks = seq(0, max(data$cum.size), 100), expand = expand_scale(add = 50)) +
+    scale_x_continuous(breaks = seq(0, max(data$cum.size), 100), expand = expansion(add = 50)) +
     theme_bw() +
     theme(axis.text.x = element_text(angle=45, hjust=1), panel.spacing = unit(0, "lines"), plot.subtitle = element_text(hjust = 0.5))          
-  # suppressWarnings({
-  # ggplot(DF, aes(x = Pos, y = Trait, colour = Pval, size = H2)) +
-  #   geom_point() +
-  #   # {if(!is.null(scale)) scale_radius(range=c(1, scale))} +
-  #   scale_radius(range=c(1, 5)) +
-  #   scale_color_gradient(trans = "log10") +
-  #   # annotate("rect", xmin = data$cum.size[1], xmax = data$cum.size[2], ymin = 3.5, ymax = 3.8, colour=NA, fill="black", alpha=.2) +
-  #   labs(title=main, x = "Linkage Group", y = "Trait", col=expression(paste(italic(p), "-value", sep="")), size=expression(italic(h)[QTL]^{2})) +
-  #   scale_x_continuous(breaks = c(data$cum.size[c(1:data$nlgs)+1]-(data$lgs.size/2)), labels = c(1:data$nlgs),
-  #                      limits = c(0,max(data$cum.size)), minor_breaks = c(data$cum.size), position = "top", expand = c(0, 0)) +
-  #   scale_y_discrete(breaks = DF$Trait) +
-  #   # theme_minimal() +
-  #   # guides(colour = guide_legend(order=1)) + # make sure it's working
-  #   # theme(legend.text = element_text(size=10), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold")) +
-  #   theme_bw() +
-  #   theme(axis.title=element_text(face="bold"), plot.title = element_text(face="bold", hjust = 0.5), axis.ticks.x=element_blank(),
-  #         axis.text.x = element_text(size=10), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_line(colour = "black"), panel.grid.major.y = element_line(linetype = "dashed"))
-  # })
-  
 }
