@@ -59,7 +59,7 @@ qtl_effects <- function(ploidy = 6, fitted, pheno.col = NULL, verbose = TRUE) {
   
   if(is.null(pheno.col)) pheno.col <- fitted$pheno.col
   results <- vector("list", length(pheno.col))
-  names(results) <- names(fitted$results)[which(fitted$phenol %in% pheno.col)]
+  names(results) <- names(fitted$results)[which(fitted$pheno.col %in% pheno.col)]
   
   for(p in 1:length(results)) {
     
@@ -102,7 +102,7 @@ qtl_effects <- function(ploidy = 6, fitted, pheno.col = NULL, verbose = TRUE) {
           s <- vector("list", dim(S)[1])
           
           for(i in 1:dim(A)[1]) {
-            a[[i]] <- which(alleles == as.character(A[i,]), arr.ind = TRUE)[,1]
+            a[[i]] <- which(alleles == as.character(A[i,1]), arr.ind = TRUE)[,1]
             a[[i]] <- mean(blups[Reduce(intersect, list(a[[i]]))])
           }
           names(a) <- as.character(A)
@@ -291,33 +291,21 @@ plot.qtlpoly.effects <- function(x, pheno.col = NULL, p1 = "P1", p2 = "P2") {
           data <- unlist(x$results[[p]]$effects[[q]])[1:36]
           data <- data.frame(Estimates=as.numeric(data), Alleles=names(data), Parent=c(rep(p1,4),rep(p2,4),rep(p1,14),rep(p2,14)), Effects=c(rep("Additive",8),rep("Digenic",28)))
           data <- data[-c(12:15,18:21,23:30),]
-          # plot <- ggplot(data, aes(x = Alleles, y = Estimates, fill = Estimates)) +
-          #   geom_bar(stat="identity") +
-          #   scale_fill_gradient2(low = "red", high = "blue", guide = FALSE) +
-          #   labs(title=names(x$results)[p], subtitle=paste("QTL", q)) +
-          #   facet_wrap(Effects ~ Parent, scales="free_x", ncol = 2) +
-          #   theme_minimal() +
-          #   theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5), title=element_text(face="bold"))
         }
         if(x$ploidy == 6) {
           data <- unlist(x$results[[p]]$effects[[q]])[-c(18:23,28:33,37:42,45:50,52:63,83:88,92:97,100:105,107:133,137:142,145:150,152:178,181:186,188:214,216:278,299:1763)]
           data <- data.frame(Estimates=as.numeric(data), Alleles=names(data), Parent=c(rep(p1,6),rep(p2,6),rep(p1,15),rep(p2,15),rep(p1,20),rep(p2,20)), Effects=c(rep("Additive",12),rep("Digenic",30),rep("Trigenic",40)))
         }
         data$Parent <- factor(data$Parent, levels=unique(data$Parent))
-        plot <- ggplot(data, aes(x = Alleles, y = Estimates, fill = Estimates)) +
+        plot <- ggplot(data[which(data$Effects == "Additive"),], aes(x = Alleles, y = Estimates, fill = Estimates)) +
           geom_bar(stat="identity") +
           scale_fill_gradient2(low = "red", high = "blue", guide = FALSE) +
           labs(title=names(x$results)[p], subtitle=paste("QTL", q, "\n")) +
-          facet_wrap(Effects ~ Parent, scales="free_x", ncol = 2) +
+          facet_wrap( ~ Parent, scales="free_x", ncol = 2) +
           # facet_grid(Effects ~ Parent, scales="free_x", space="free_x") +
           theme_minimal() +
-          theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5), title=element_text(face="bold"),
-                axis.text.x.bottom = element_text(angle = 90, hjust = 1, vjust = 0.5), strip.text = element_blank(),
-                plot.margin = unit(c(0,1,0,0), "lines"))
+          theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5), axis.text.x.bottom = element_text(hjust = 1, vjust = 0.5))
         print(plot)
-        gp <- grid::gpar(fontsize=9, col="grey30")
-        grid::grid.text(x=c(.30,.75),y=c(.90,.90), label = c(p1,p2), rot = 0, gp=gp)
-        if(x$ploidy == 6) grid::grid.text(x=c(.99,.99,.99),y=c(.74,.49,.21), label = levels(data$Effects), rot = 270, gp=gp) # right
       }
     }
   }
