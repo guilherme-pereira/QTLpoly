@@ -8,7 +8,11 @@
 #'
 #' @param pheno.col a numeric vector with the phenotype column numbers to be plotted; if \code{NULL}, all phenotypes from \code{'data'} will be included.
 #'
-#' @param main a character string with the main title; if \code{NULL}, no title will be shown.
+#' @param sup.int if \code{TRUE}, support interval are shown as shaded areas; if \code{FALSE} (default), no support interval is show.
+#' 
+#' @param main a character string with the main title; if \code{NULL}, no title is shown.
+#'
+#' @param legend legend position (either "bottom", "top", "left" or "right"); if \code{NULL}, no legend is shown.
 #'
 #' @param ylim a numeric value pair supplying the limits of y-axis, e.g. c(0,10); if \code{NULL} (default), limits will be provided automatically.
 #'
@@ -51,9 +55,8 @@
 #' @export plot_profile
 #' @import ggplot2
 
-plot_profile <- function(data = data, model = model, pheno.col = NULL, main = NULL, ylim = NULL, grid = FALSE) {
+plot_profile <- function(data = data, model = model, pheno.col = NULL, sup.int = FALSE, main = NULL, legend="bottom", ylim = NULL, grid = FALSE) {
   
-  sint = FALSE # fixme
   lines <- points <- thre <- map <- data.frame()
   y.dat <- trait.names <- c()
   count <- 0
@@ -107,7 +110,7 @@ plot_profile <- function(data = data, model = model, pheno.col = NULL, main = NU
   
   pl <- ggplot(data = lines, aes(x = POS)) +
     {if(grid) facet_grid(TRT ~ LGS, scales = "free", space = "free", shrink = TRUE) else facet_grid(~ LGS, scales = "free_x", space = "free_x")} +
-    {if(nrow(points) > 0 & sint) geom_rect(data=points, aes(xmin = INF, xmax = SUP, ymin = -Inf, ymax = Inf, fill = TRT), alpha = 0.2)} +
+    {if(nrow(points) > 0 & sup.int) geom_rect(data=points, aes(xmin = INF, xmax = SUP, ymin = -Inf, ymax = Inf, fill = TRT), alpha = 0.2)} +
     geom_line(data=lines, aes(y = SIG, color = TRT), size=1, alpha=0.8, lineend = "round") +
     geom_point(data=map, aes(y=0, x=POS), shape="|", alpha=200/dim(map)[1]) +
     {if(nrow(points) > 0) geom_point(data=points, aes(y = y.dat, color = TRT), shape = 2, size = 2, stroke = 1, alpha = 0.8)} +
@@ -119,11 +122,12 @@ plot_profile <- function(data = data, model = model, pheno.col = NULL, main = NU
     # {if((!is.null(ylim) & length(pheno.col) == 1) | (!is.null(ylim) & !grid)) scale_y_continuous(limits = ylim)} +
     {if(nrow(thre) > 0) geom_hline(data=thre, aes(yintercept=SIG, color=TRT), linetype="dashed", size=.5, alpha=0.8)} + #threshold
     guides(color = guide_legend("Trait"), fill = guide_legend("Trait"), shape = guide_legend("Trait")) + 
-    labs(title=main, y = y.lab, x = "Position (cM)", subtitle="Linkage Group") +
+    labs(title=main, y = y.lab, x = "Position (cM)", subtitle="Linkage group") +
     # {if(!is.null(main)) labs(title=main)} +
     theme_minimal() +
-    theme(legend.position="bottom", plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5),
-          title=element_text(face="bold"), strip.text.x = element_text(size = 10), panel.spacing.x = unit(0.01, "lines"), panel.spacing.y = unit(0.05, "lines"), strip.text.y = element_blank(),
-          axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+    theme(legend.position=legend, plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5),
+          panel.spacing.x = unit(0.01, "lines"), panel.spacing.y = unit(0.05, "lines"), strip.text.y = element_blank(),
+          axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+    {if(is.null(legend)) guides(color = FALSE)}
   print(pl)
 }

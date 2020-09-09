@@ -301,7 +301,7 @@ plot.qtlpoly.effects <- function(x, pheno.col = NULL, p1 = "P1", p2 = "P2") {
           geom_bar(stat="identity") +
           scale_fill_gradient2(low = "red", high = "blue", guide = FALSE) +
           labs(title=names(x$results)[p], subtitle=paste("QTL", q, "\n")) +
-          facet_wrap( ~ Parent, scales="free_x", ncol = 2) +
+          facet_wrap(. ~ Parent, scales="free_x", ncol = 2, strip.position="bottom") +
           # facet_grid(Effects ~ Parent, scales="free_x", space="free_x") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5), axis.text.x.bottom = element_text(hjust = 1, vjust = 0.5))
