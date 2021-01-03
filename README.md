@@ -16,8 +16,7 @@ As mentioned, the package `qtlpoly` depends on a couple of functions from `somme
 `qtlpoly` package is available here on [GitHub](https://github.com/guilherme-pereira/qtlpoly). You can install all needed packages within R using the functions from the R package `devtools`:
 
 ```r
-> install.packages("data.table")
-> install.packages("devtools")
+> install.packages(c("devtools", "data.table"))
 > devtools::install_url("https://cran.r-project.org/src/contrib/Archive/SPA3G/SPA3G_1.0.tar.gz")
 > devtools::install_url("https://cran.r-project.org/src/contrib/Archive/varComp/varComp_0.2-0.tar.gz")
 > devtools::install_version("sommer", version = "3.6", repos = "http://cran.us.r-project.org", upgrade = FALSE)
