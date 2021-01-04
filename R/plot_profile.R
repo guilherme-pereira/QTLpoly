@@ -96,7 +96,8 @@ plot_profile <- function(data = data, model = model, pheno.col = NULL, sup.int =
       y.lab <- "LOD"
     }
   } else {
-    y.lab <- "LOP"
+    # y.lab <- "LOP"
+    y.lab <- expression(-log[10](italic(P)))
   }
   if(is.null(y.dat)) y.dat <- ylim[1]
   if(grid) y.dat <- -max(lines$SIG[is.finite(lines$SIG)])/10

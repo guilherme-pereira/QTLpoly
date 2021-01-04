@@ -11,7 +11,7 @@ LazyData: TRUE
 Depends:
     R (>= 3.5)
 Imports:
-    varComp (== 0.2), sommer (== 3.6), ggplot2 (>= 3.1), abind (>= 1.4), MASS (>= 7.3), parallel, stats
+    varComp (== 0.2), sommer (== 3.6), ggplot2 (>= 3.1), abind (>= 1.4), MASS (>= 7.3), arrangements (>= 1.1), parallel, stats
 Suggests: mappoly, rmarkdown, devtools
 Remotes:
     cran/varComp, mmollina/MAPpoly

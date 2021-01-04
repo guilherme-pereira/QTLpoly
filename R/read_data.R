@@ -57,7 +57,7 @@
 #' @export read_data
 #' @importFrom abind abind
 
-read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, pheno = pheno, weights = NULL, step = 1) {
+read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, double.reduction = FALSE, pheno = pheno, weights = NULL, step = 1) {
   
   # if (!is.null(pheno) && !is.null(geno.prob) || !is.null(geno.dose) ) {
   #   nphe <- dim(pheno)[2] 
@@ -97,10 +97,25 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, pheno 
     nmrk <- dim(Z)[2]
     nind <- dim(Z)[3]
     
-    Palleles <- letters[1:ploidy]
-    Pgametes <- lapply(combn(Palleles, ploidy/2, simplify = FALSE), paste, collapse="")
+    if(double.reduction) {
+      if(ploidy == 4) n.unique <- 1
+      if(ploidy == 6) n.unique <- 2
+      if(ploidy == 8) n.unique <- 3
+      if(ploidy == 10) n.unique <- 4
+      if(ploidy == 12) n.unique <- 5
+    } else {
+      n.unique <- ploidy/2
+    }
+    Palleles <- letters[1:ploidy]; length(Palleles)
+    Pgametes <- arrangements::combinations(Palleles, ploidy/2, replace=TRUE); dim(Pgametes)
+    Punique <- apply(Pgametes, 1, unique); length(Punique)
+    Pgametes <- apply(Pgametes[which(lapply(Punique, length) >= n.unique),], 1, paste, collapse=""); length(Pgametes)
+    # Pgametes <- lapply(combn(Palleles, ploidy/2, simplify = FALSE), paste, collapse=""); length(Pgametes)
     Qalleles <- letters[(ploidy+1):(2*ploidy)]
-    Qgametes <- lapply(combn(Qalleles, ploidy/2, simplify = FALSE), paste, collapse="")
+    Qgametes <- arrangements::combinations(Qalleles, ploidy/2, replace=TRUE); dim(Qgametes)
+    Qunique <- apply(Qgametes, 1, unique); length(Qunique)
+    Qgametes <- apply(Qgametes[which(lapply(Qunique, length) >= n.unique),], 1, paste, collapse=""); length(Qgametes)
+    # Qgametes <- lapply(combn(Qalleles, ploidy/2, simplify = FALSE), paste, collapse="")
     genotypes <- as.vector(t(outer(Pgametes, Qgametes, paste, sep="")))
     sibs <- sapply( genotypes, FUN=function(x) paste(x, genotypes, sep="") )
     Pi <- matrix(data = NA, nrow = length(Pgametes)^2, ncol = length(Pgametes)^2)
@@ -109,11 +124,14 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, pheno 
         Pi[i,j] <- ((2*ploidy)-length(unique(strsplit(sibs[i,j], "")[[1]])))/ploidy
       }
     }
-    colnames(Pi) <- rownames(Pi) <- as.vector(t(outer(Pgametes, Qgametes, paste, sep=":")))
+    sib.names <- as.vector(t(outer(Pgametes, Qgametes, paste, sep=":")))
+    colnames(Pi) <- rownames(Pi) <- sib.names
+    
+    # dimnames(Z)[[1]] <- sib.names #DOUBLE CHECK IF IT'S CORRECT
     
     G <- array(data = NA, dim = c(nind, nind, nmrk), dimnames = list(c(ind.names), c(ind.names), c(mrk.names)))
     for(m in 1:nmrk) {
-      G[,,m] <- t(Z[,m,])%*%Pi%*%Z[,m,]
+      G[,,m] <- t(Z[sib.names,m,])%*%Pi%*%Z[sib.names,m,]
     }
     
     nphe <- dim(pheno)[2]
@@ -126,8 +144,6 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, pheno 
     } else {
       weights.new <- NULL
     }
-    
-    dimnames(Z)[[1]] <- as.vector(t(outer(Pgametes, Qgametes, paste, sep=":"))) #EXCLUIR
     
     alleles <- matrix(unlist(strsplit(dimnames(Z)[[1]], '')), ncol=(ploidy+1), byrow=TRUE)[,-c((ploidy/2)+1)]
     X <- array(data = NA, dim = c(nind, (ploidy*2), nmrk), dimnames = list(c(ind.names), letters[1:(ploidy*2)], c(mrk.names)))
@@ -155,7 +171,7 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, pheno 
     lgs.size <- numeric(nlgs)
     lgs.nmrk <- numeric(nlgs)
     for(c in 1:nlgs) {
-      sel.mrk[[c]] <- which(geno.dose$sequence == c)
+      sel.mrk[[c]] <- rownames(TB.trifida$geno.dose)[which(geno.dose$sequence == c)]
       if (length(geno.dose$sequence.pos)>1) lgs.all[[c]] <- geno.dose$sequence.pos[sel.mrk[[c]]] else lgs.all[[c]] <- c(1:length(sel.mrk[[c]]))
       lgs[[c]] <- c(lgs.all[[c]][c(1:length(lgs.all[[c]]))]) #fixme: ta gerando tamanho menor no exemplo do russet
       lgs.size[c] <- last(lgs[[c]])
@@ -170,7 +186,7 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, pheno 
     for(d in 0:ploidy) dsg.names[d+1] <- paste(paste(rep("A", ploidy-d), collapse = "", sep=""), paste(rep("B", d), collapse = "", sep=""), collapse = "", sep="")
     # ordered <- order(geno.dose$geno$ind)
     # geno.dose$geno <- geno.dose$geno[order(geno.dose$geno$ind),]
-    Z.dose <- array(0, dim=c(nmrk, geno.dose$n.ind, ploidy+1), dimnames = list(names(unlist(sel.mrk)), names(geno.dose$geno.dose), dsg.names))
+    Z.dose <- array(0, dim=c(nmrk, geno.dose$n.ind, ploidy+1), dimnames = list(unlist(sel.mrk), colnames(geno.dose$geno.dose), dsg.names))
     for(d in 0:ploidy) {
       Z.dose[,,d] <- as.matrix((geno.dose$geno.dose[unlist(sel.mrk),] == d) + 0)
     }
@@ -200,8 +216,12 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, pheno 
     nphe <- dim(pheno)[2]
     pheno.new <- as.matrix(pheno[which(rownames(pheno) %in% ind.names),])
     rownames(pheno.new) <- rownames(pheno)[which(rownames(pheno) %in% ind.names)]
-    weights.new <- as.matrix(weights[which(rownames(weights) %in% ind.names),])
-    rownames(weights.new) <- rownames(weights)[which(rownames(weights) %in% ind.names)]
+    if(!is.null(weights)) {
+      weights.new <- as.matrix(weights[which(rownames(weights) %in% ind.names),])
+      rownames(weights.new) <- rownames(weights)[which(rownames(weights) %in% ind.names)]
+    } else {
+      weights.new <- NULL
+    }
     
     X.dose <- as.matrix(geno.dose$geno.dose[unlist(sel.mrk),ind.names])
     X.dose[X.dose >= ploidy+1] <- NA
@@ -274,5 +294,5 @@ print.qtlpoly.data <- function(x, detailed = FALSE) {
   }
   cat("  No. phenotypes:     ", x$nphe, "\n", sep="")
   if(detailed) for(p in 1:x$nphe) cat("    Trait ", p, ": ", sQuote(colnames(x$pheno)[p]), " (", sum(!is.na(x$pheno[,p])), " individuals) \n", sep="")
-  if(!is.null(weights)) cat("    Phenotypes contain weights \n", sep="")
+  if(!is.null(x$weights)) cat("    Phenotypes contain weights \n", sep="")
 }
