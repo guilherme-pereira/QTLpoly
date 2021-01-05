@@ -1,7 +1,7 @@
 ---
 title: "Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly"
 author: "Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng"
-date: "2019-03-30 (last update 2021-01-04)"
+date: "2019-03-30 (last update 2021-01-05)"
 output:
   html_document:
     highlight: tango
@@ -33,11 +33,11 @@ editor_options:
 
 # Introduction
 
-The R package `qtlpoly` (v. 0.2-1) [@Pereira2020] is an under development software to map multiple quantitative trait loci (QTL) in full-sib families of outcrossing autopolyploid species. It is based on the following random-effect model:
+The R package `qtlpoly` (v. 0.2.1) [@Pereira2020] is an under development software to map multiple quantitative trait loci (QTL) in full-sib families of outcrossing autopolyploid species. It is based on the following random-effect model:
 
 $$\boldsymbol{y} = \boldsymbol{1}\mu + \sum_{q=1}^Q \boldsymbol{g}_q + \boldsymbol{e}$$
 
-where the vector of phenotypic values from a specific trait $\boldsymbol{y}$ is a function of the fixed intercept $\mu$, the $Q$ random QTL effects $\boldsymbol{g}_q$ ($q = 1, \dots, Q$), and the random environmental error $\boldsymbol{e}$.
+where the vector of phenotypic values from a specific trait $\boldsymbol{y}$ is a function of the fixed intercept $\mu$, the $q = 1, \dots, Q$ random QTL effects $\boldsymbol{g}_q \sim \mathcal{N}(\boldsymbol{0}, \boldsymbol{I}\sigma^2_q)$, and the random environmental error $\boldsymbol{e} \sim \mathcal{N}(\boldsymbol{0}, \boldsymbol{I}\sigma^2)$.
 
 Variance components associated with putative QTL ($\sigma^2_q$) are tested using score statistics from the R package `varComp` (v. 0.2-0) [@Qu2013]. Final models are fitted using residual maximum likelihood (REML) from the R package `sommer` (v. 3.6) [@Covarrubias-Pazaran2016]. Plots for visualizing the results are based on `ggplot2` (v. 3.1.0) [@Wickham2016]. 
 
@@ -69,7 +69,7 @@ Then, use the function `library()` -- or `require()` -- to load the package, and
 
 These simulated data were made simpler, so that one could run the functions along with this tutorial in a regular personal computer (with 4 cores and 6 GB of RAM, minimum). For real data analyses, you may need to run an R script in a cluster with more cores and RAM, though. In general, the computational needs depend on ploidy level, population size and number of markers.
 
-The data was based on a full-sib family ($N = 300$) simulated from a cross between two parents from a putative autohexaploid species with three chromosomes. The simulated linkage map consists of three linkage groups (LGs) with 1,310 markers, spanning 265 centiMorgans (cM) in total. Please see details on the map construction for this simulated cross using `mappoly` [here](https://mmollina.github.io/tutorials/hexa_fake/haxaploid_map_construction.html).
+The data was based on a full-sib family ($N = 300$) simulated from a cross between two parents from a putative autohexaploid species with three chromosomes. The simulated linkage map consists of three linkage groups (LGs) with 1,310 markers, spanning 274.76 centiMorgans (cM) in total. Please see details on the map construction for this simulated cross using `mappoly` [here](https://mmollina.github.io/tutorials/hexa_fake/haxaploid_map_construction.html).
 
 The phenotypic data contains three traits, and it is a simple table with traits in columns and individuals in rows. For example:
 
@@ -308,7 +308,7 @@ It is worth to mention that `<2.22e-16` is used to represent that the test has r
 
 This example uses `polygenes = FALSE` (the default), which means that a variance component for every QTL has to be estimated, as the equation at the [Introduction]. `polygenes = TRUE` provides the same results for this example (and will most likely do so for the vast majority of cases), but in less computational time. For example, the same four QTL have been detected for trait 'T32' using `polygenes = TRUE`, but it took 268.13 seconds, instead of 401.83 seconds. Much difference will not be noticed if only few QTL were added to the model. For example, computational time for traits 'T17' and 'T45' was 129.26 and 129.24 seconds, respectively, when using `polygenes = TRUE`, instead of 152.00 and 153.74 seconds. 
 
-This is because the model becomes $\boldsymbol{y} = \boldsymbol{1}\mu + \boldsymbol{g}_r + \boldsymbol{g}^* + \boldsymbol{e}$, where $\boldsymbol{g}_r$ is the the new QTL $r$ being tested and $\boldsymbol{g}^*$ is the polygenic effect (all QTL $q \neq r$ already in the model summarized in one single random effect), with only two variance components to estimate (plus the residual variance). So, for instance, if you already have three QTL in a model and are looking for a forth one, `polygenes = FALSE` will use the full model to estimate four variance components associated with each QTL, whereas `polygenes = TRUE` will force the algorithm to estimate only two variance components: one for the new QTL being tested and one for the polygenic effect. 
+This is because the model becomes $\boldsymbol{y} = \boldsymbol{1}\mu + \boldsymbol{g}_r + \boldsymbol{g}^* + \boldsymbol{e}$, where $\boldsymbol{g}_r$ is the the new QTL $r$ being tested and $\boldsymbol{g}^*$ is the polygenic effect (all QTL $q \neq r$ already in the model summarized into one single random effect), with only two variance components to estimate (plus the residual variance). So, for instance, if you already have three QTL in a model and are looking for a forth one, `polygenes = FALSE` will use the full model to estimate four variance components associated with each QTL, whereas `polygenes = TRUE` will force the algorithm to estimate only two variance components: one for the new QTL being tested and one for the polygenic effect. 
 
 ### 2. Model optimization
 
@@ -497,7 +497,7 @@ For objects of class 'qtlpoly.profile', you can also choose to print both lower 
 
 According to simulations [@Pereira2020], $d = 1.5$ was found to represent a support interval of ~95\% of coverage; $d= 1.0$ corresponds to ~90\%, and $d=2.0$ to ~97\%. Obviously, the greater the coverage, the broader the support interval interval.
 
-## Add or drop QTL to/from the model
+## Add/drop QTL to/from the model
 
 Suppose you have information (from previous work, for instance) that can help you to decide whether a QTL should be in the model or not. You can take advantage of the function `modify_qtl()` to either include or exclude a certain putative QTL from the model. For example, let us say we want to add a QTL to the trait 3 'T17' model on LG 3 at 13.03 cM (position number 184), which has not reached the most stringent threshold when a second search was performed after (see the results from the step [2. Model optimization]). We simply choose the `pheno.col` and the position where we want a QTL to be added, i.e. `add.qtl = 184`:
 
@@ -705,7 +705,7 @@ Since support intervals have been calculated, you can print them as well by spec
 ## There are no QTL in the model
 ```
 
-You can always use the `modify()` function to [add or drop QTL from the model] originated by an automatic search. Remember to run the `profile()` function from the step [3. QTL profiling] in order to get updated positions and statistics for the new model, in case any modification is performed. 
+You can always use the `modify_qtl()` function to [add/drop QTL to/from the model] originated by an automatic search. Remember to run the `profile_qtl()` function from the step [3. QTL profiling] in order to get updated positions and statistics for the new model, in case any modification is performed. 
 
 ## Plot profiles
 
@@ -748,7 +748,7 @@ You can visualize the QTL distributed along the linkage map, together with their
 
 <img src="1-tutorial_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" />
 
-Notice that for highly significant QTL ($P < 2.22 \times 10^{-16}$), computing support intervals may not be feasible, which is commonly regarded as very narrow support interval. We used the same colors as in [plot profiles] to keep them consistent through plots. Obviously, no QTL are shown for the trait 3 'T45'.
+Notice that for highly significant QTL ($P < 2.22 \times 10^{-16}$), computing support intervals may not be very reliable, which is expected to be narrower than the support interval for the QTL on LG 2 for 'T32'. We used the same colors as in [plot profiles] to keep them consistent through plots. Obviously, no QTL are shown for the trait 3 'T45'.
 
 # Fit multiple QTL models
 
