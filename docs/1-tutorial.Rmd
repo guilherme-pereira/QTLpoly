@@ -35,7 +35,7 @@ knitr::opts_chunk$set(cache = TRUE, echo = TRUE, eval = TRUE, results = 'hold', 
 
 # Introduction
 
-The R package `qtlpoly` (v. 0.2-1) [@Pereira2020] is an under development software to map multiple quantitative trait loci (QTL) in full-sib families of outcrossing autopolyploid species. It is based on the following random-effect model:
+The R package `qtlpoly` (v. 0.2.1) [@Pereira2020] is an under development software to map multiple quantitative trait loci (QTL) in full-sib families of outcrossing autopolyploid species. It is based on the following random-effect model:
 
 $$\boldsymbol{y} = \boldsymbol{1}\mu + \sum_{q=1}^Q \boldsymbol{g}_q + \boldsymbol{e}$$
 
