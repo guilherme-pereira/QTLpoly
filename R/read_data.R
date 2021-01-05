@@ -6,7 +6,13 @@
 #'
 #' @param geno.prob an object of class \code{mappoly.genoprob} from \pkg{mappoly}.
 #'
-#' @param pheno a data frame of phenotypes (columns) with individual names (rows) identical to individual names in \code{geno.prob} object.
+#' @param geno.dose an object of class \code{mappoly.data} from \pkg{mappoly}.
+#'
+#' @param double.reduction if \code{TRUE}, double reduction genotypes are taken into account; if \code{FALSE}, no double reduction genotypes are considered.
+#'
+#' @param pheno a data frame of phenotypes (columns) with individual names (rows) identical to individual names in \code{geno.prob} and/or \code{geno.dose} object.
+#'
+#' @param weights a data frame of phenotype weights (columns) with individual names (rows) identical to individual names in \code{pheno} object.
 #'
 #' @param step a numeric value of step size (in centiMorgans) where tests will be performed, e.g. 1 (default); if \code{NULL}, tests will be performed at every marker.
 #'
@@ -171,7 +177,7 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, double
     lgs.size <- numeric(nlgs)
     lgs.nmrk <- numeric(nlgs)
     for(c in 1:nlgs) {
-      sel.mrk[[c]] <- rownames(TB.trifida$geno.dose)[which(geno.dose$sequence == c)]
+      sel.mrk[[c]] <- rownames(geno.dose$geno.dose)[which(geno.dose$sequence == c)]
       if (length(geno.dose$sequence.pos)>1) lgs.all[[c]] <- geno.dose$sequence.pos[sel.mrk[[c]]] else lgs.all[[c]] <- c(1:length(sel.mrk[[c]]))
       lgs[[c]] <- c(lgs.all[[c]][c(1:length(lgs.all[[c]]))]) #fixme: ta gerando tamanho menor no exemplo do russet
       lgs.size[c] <- last(lgs[[c]])
@@ -241,7 +247,7 @@ read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, double
   if (!is.null(G.dose)) {
     cat("  No. chromosomes:    ", nlgs, "\n", sep="")
     cat("  Step size:          ", step, "\n", sep="")
-    cat("  Genome size:        ", round(last(cum.size)/10e5, 2), " Mbp (", last(cum.nmrk), " positions) \n", sep="")
+    cat("  Genome size:        ", round(last(cum.size)/10e5, 2), " Mbp (", last(cum.nmrk), ") \n", sep="")
   }
   cat("  No. phenotypes:     ", nphe, "\n", sep="")
   
