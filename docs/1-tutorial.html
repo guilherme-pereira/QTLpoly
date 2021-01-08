@@ -1589,7 +1589,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly</h1>
 <h4 class="author">Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng</h4>
-<h4 class="date">2019-03-30 (last update 2021-01-05)</h4>
+<h4 class="date">2019-03-30 (last update 2021-01-07)</h4>
 
 </div>
 
@@ -1612,8 +1612,10 @@ div.tocify {
 <a class="sourceLine" id="cb1-5" title="5"><span class="op">&gt;</span><span class="st"> </span>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;guilherme-pereira/qtlpoly&quot;</span>, <span class="dt">upgrade =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>Then, use the function <code>library()</code> – or <code>require()</code> – to load the package, and the function <code>data()</code> to preload the simulated linkage map and phenotypic data that comes with the package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(qtlpoly) </a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(maps)</a>
-<a class="sourceLine" id="cb2-3" title="3"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(pheno)</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(maps6x)</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co">## Warning in data(maps6x): data set &#39;maps6x&#39; not found</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(pheno6x)</a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="co">## Warning in data(pheno6x): data set &#39;pheno6x&#39; not found</span></a></code></pre></div>
 <p>These simulated data were made simpler, so that one could run the functions along with this tutorial in a regular personal computer (with 4 cores and 6 GB of RAM, minimum). For real data analyses, you may need to run an R script in a cluster with more cores and RAM, though. In general, the computational needs depend on ploidy level, population size and number of markers.</p>
 <p>The data was based on a full-sib family (<span class="math inline">\(N = 300\)</span>) simulated from a cross between two parents from a putative autohexaploid species with three chromosomes. The simulated linkage map consists of three linkage groups (LGs) with 1,310 markers, spanning 274.76 centiMorgans (cM) in total. Please see details on the map construction for this simulated cross using <code>mappoly</code> <a href="https://mmollina.github.io/tutorials/hexa_fake/haxaploid_map_construction.html">here</a>.</p>
 <p>The phenotypic data contains three traits, and it is a simple table with traits in columns and individuals in rows. For example:</p>

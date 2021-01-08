@@ -1,7 +1,7 @@
 ---
 title: "Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly"
 author: "Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng"
-date: "2019-03-30 (last update 2021-01-05)"
+date: "2019-03-30 (last update 2021-01-07)"
 output:
   html_document:
     highlight: tango
@@ -63,8 +63,10 @@ Then, use the function `library()` -- or `require()` -- to load the package, and
 
 ```r
 > library(qtlpoly) 
-> data(maps)
-> data(pheno)
+> data(maps6x)
+## Warning in data(maps6x): data set 'maps6x' not found
+> data(pheno6x)
+## Warning in data(pheno6x): data set 'pheno6x' not found
 ```
 
 These simulated data were made simpler, so that one could run the functions along with this tutorial in a regular personal computer (with 4 cores and 6 GB of RAM, minimum). For real data analyses, you may need to run an R script in a cluster with more cores and RAM, though. In general, the computational needs depend on ploidy level, population size and number of markers.
