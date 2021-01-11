@@ -30,7 +30,7 @@ Do not update `sommer` to the most recent version even if R asks you to do so wh
 Tutorials as well as simulated and real data set analyses will be listed here opportunately in order to help users to get familiar with the software and allow them to perform their own analyses:
 
 1. [Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly](https://guilherme-pereira.github.io/QTLpoly/1-tutorial)
-2. Score-based resampling method to assess genome-wide significance
+2. [Multiple QTL Mapping in an Autotetraploid F1 population with QTLpoly](https://guilherme-pereira.github.io/QTLpoly/2-tetraploid_example.html)
 
 ## Acknowledgments
 
