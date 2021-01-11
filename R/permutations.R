@@ -48,7 +48,7 @@
 #' @references
 #'     Churchill GA, Doerge RW (1994) Empirical threshold values for quantitative trait mapping, \emph{Genetics} 138: 963-971. \url{http://www.genetics.org/content/138/3/963}
 #'
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 #'
 #' @export permutations
 #' @import parallel

@@ -10,7 +10,7 @@
 #'
 #' @param var.error simulated error variance, e.g. 1 (default).
 #'
-#' @param linked if \code{TRUE} (default), at least two QTL will be linked; if \code{FALSE}, QTL will be randomly assigned along the genetic map.
+#' @param linked if \code{TRUE} (default), at least two QTL will be linked; if \code{FALSE}, QTL will be randomly assigned along the genetic map. Linkage is defined by a genetic distance smaller than the selected \code{w.size}.
 #'
 #' @param n.sim number of simulations, e.g. 1000 (default).
 #'
@@ -50,7 +50,7 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 #'     
 #' @export simulate_qtl
 #'

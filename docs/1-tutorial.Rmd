@@ -30,7 +30,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache = TRUE, echo = TRUE, eval = TRUE, results = 'hold', collapse = TRUE, tidy.opts = list(width.cutoff=75), tidy = TRUE, fig.width = 6, fig.height = 5, fig.align = 'center', fig.ncol = 1, prompt=TRUE)
+knitr::opts_chunk$set(eval = TRUE, cache = TRUE, echo = TRUE, results = 'hold', collapse = TRUE, tidy.opts = list(width.cutoff=75), tidy = TRUE, fig.width = 6, fig.height = 5, out.width = '70%', out.height = '70%', dpi = 150, fig.align = 'center', fig.ncol = 1, prompt = TRUE)
 ```
 
 # Introduction
@@ -47,7 +47,7 @@ This tutorial used `r R.version.string` running on either Ubuntu 18.04.1 LTS (64
 
 ## Install and load the `qtlpoly` package and data
 
-As mentioned, the package `qtlpoly` depends on a couple of functions from `sommer` (v. 3.6) and `varComp` (v. 0.2-0). `varComp` has been [archived from CRAN](https://cran.r-project.org/src/contrib/Archive/varComp/), while `sommer` has been constantly updated. In order to avoid conflit with updates in functions and object structures, we decided to stick with an earlier `sommer` version (v. 3.6), so you will need to downgrade if you have installed the most recent version of `sommer`.
+As mentioned, the package `qtlpoly` depends on a couple of functions from `sommer` (v. 3.6) and `varComp` (v. 0.2-0). `varComp` has been [archived from CRAN](https://cran.r-project.org/src/contrib/Archive/varComp/), while `sommer` has been constantly updated. In order to avoid conflict with updates in functions and object structures, we decided to stick with an earlier `sommer` version (v. 3.6), so you will need to downgrade if you have installed the most recent version of `sommer`.
 
 `qtlpoly` package is available at [GitHub](https://github.com/guilherme-pereira/qtlpoly). You can install all needed packages within R using the functions from the R package `devtools`:
 
@@ -61,10 +61,10 @@ devtools::install_github("guilherme-pereira/qtlpoly", upgrade = FALSE)
 
 Then, use the function `library()` -- or `require()` -- to load the package, and the function `data()` to preload the simulated linkage map and phenotypic data that comes with the package:
 
-```{r}
+```{r, cache=FALSE}
 library(qtlpoly) 
-data(maps6x)
-data(pheno6x)
+data(maps)
+data(pheno)
 ```
 
 These simulated data were made simpler, so that one could run the functions along with this tutorial in a regular personal computer (with 4 cores and 6 GB of RAM, minimum). For real data analyses, you may need to run an R script in a cluster with more cores and RAM, though. In general, the computational needs depend on ploidy level, population size and number of markers.
@@ -183,7 +183,7 @@ Once the first run of forward search has been carried out for each trait, a set 
 
 2. QTL is significant, but in a different position in the linkage group: QTL position is updated (process called "position refinement");
 
-3. QTL is not significant: QTL is dropped (refered as "backward elimination").
+3. QTL is not significant: QTL is dropped (referred as "backward elimination").
 
 Rounds of model optimization are repeated until no more QTL have their positions updated or are dropped. This process is documented in a series of plots in a PDF file named after each trait (e.g. 'T32_optimize.pdf') with a suffix as in `plot = "optimize"`:
 
@@ -309,7 +309,7 @@ You can always use the `modify_qtl()` function to [add/drop QTL to/from the mode
 Given the final profiled models, you can plot either individual or joint $LOP$ profiles using the function `plot_profile()`. For individual plots, one need to specify the `pheno.col` argument:
 
 ```{r, results='hold'}
-for(p in remim.mod$pheno.col) plot_profile(data = data, model = remim.mod, pheno.col = p, ylim = c(0,10)) 
+for(p in remim.mod$pheno.col) plot_profile(data = data, model = remim.mod, pheno.col = p, ylim = c(0,10))   
 ```
 
 Triangles show where the mapped QTL peaks are located. By providing values to the y-axis limits using `ylim`, one makes sure that all plots will be at the same scales. 
@@ -317,8 +317,8 @@ Triangles show where the mapped QTL peaks are located. By providing values to th
 If one wants to plot some or all QTL profiles at once for comparison, `pheno.col` needs to be specified as a vector of numbers representing the phenotype columns. As default, `pheno.col = NULL` includes all evaluated traits:
 
 ```{r}
-plot_profile(data = data, model = remim.mod, grid = TRUE)  
-plot_profile(data = data, model = remim.mod, grid = FALSE)
+plot_profile(data = data, model = remim.mod, grid = TRUE) 
+plot_profile(data = data, model = remim.mod, grid = FALSE) 
 ```
 
 The argument `grid` organizes the multiple plots as a grid if `TRUE`, or superimposed profiles if `FALSE`.
@@ -448,7 +448,7 @@ Remember, in this case, one should not sum adjusted $R^2$ from the same trait, a
 Finally, one may want to plot the profiles and compare with the [plot profiles] from REMIM:
 
 ```{r}
-plot_profile(data = data, model = feim.mod, grid = TRUE) 
+plot_profile(data = data, model = feim.mod, grid = TRUE)  
 ```
 
 Notice that one QTL on LG 1 was not detected for the trait 'T32' (false negative), while one QTL on LG 3 for the trait 'T45' was wrongly assigned (false positive). This exemplifies the power of multiple-QTL models over the single-QTL ones. Therefore, the FEIM model may be recommended only as a first, quick approach, but not as the ultimate model for detecting QTL in autopolyploid species. 

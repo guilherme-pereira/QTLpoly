@@ -64,7 +64,7 @@
 #' @references
 #'     Kao CH, Zeng ZB, Teasdale RD (1999) Multiple interval mapping for quantitative trait loci. \emph{Genetics} 152 (3): 1203–16. \url{www.genetics.org/content/152/3/1203}. 
 #' 
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 #'     
 #'     Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
 #'
@@ -72,7 +72,7 @@
 #'
 #' @export remim
 
-remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.20, sig.bwd = 0.05, score.null = NULL, d.sint = 1.5, polygenes = FALSE, n.clusters = NULL, n.rounds = Inf, plot = "remim", verbose = TRUE) {
+remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd = 0.0001, score.null = NULL, d.sint = 1.5, polygenes = FALSE, n.clusters = NULL, n.rounds = Inf, plot = "remim", verbose = TRUE) {
   
   if(is.null(n.clusters)) n.clusters <- 1
   cat("INFO: Using", n.clusters, "CPUs for calculation\n\n")
@@ -93,17 +93,25 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.20, sig.bwd =
   if(!is.null(plot)) plot <- paste(plot, "pdf", sep = ".")
   results <- vector("list", length(pheno.col))
   names(results) <- colnames(data$pheno)[pheno.col]
+  if(data$step > 1) w.size <- w.size/data$step
   
   for(p in 1:length(results)) {
     
     round <- 1
-    if(data$step > 1) w.size <- w.size/data$step
     stat <- numeric(data$nmrk)
     pval <- numeric(data$nmrk)
     start <- proc.time()
     if(verbose) cat("REMIM for trait", pheno.col[p], sQuote(colnames(data$pheno)[pheno.col[p]]), "\n")
     # if(!is.null(plot)) pdf(paste(colnames(data$pheno)[pheno.col], ".pdf", sep = ""))
     if(!is.null(plot)) pdf(paste(colnames(data$pheno)[pheno.col[p]], plot, sep = "_"))
+    if(!is.null(min.pvl)) {
+      sig.fwd <- quantile(sort(min.pvl), sig.fwd0); # cat(sig.fwd, "\n")
+      sig.bwd <- quantile(sort(min.pvl), sig.bwd0); # cat(sig.bwd, "\n")
+    } else {
+      sig.fwd <- sig.fwd0
+      sig.bwd <- sig.bwd0
+    }
+    
     ind <- rownames(data$pheno)[which(!is.na(data$pheno[,pheno.col[p]]))]
     Y <- data$pheno[ind,pheno.col[p]]
     if(!is.null(data$weights)) weight <- data$weights[ind,pheno.col[p]] else weight <- rep(1,length(ind))
@@ -123,14 +131,6 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.20, sig.bwd =
     qtl.lgr <- c()
     qtl.pos <- c()
     qtl.out0 <- c()
-    
-    if(!is.null(min.pvl)) {
-      sig.fwd <- quantile(sort(min.pvl), sig.fwd0); cat(sig.fwd, "\n")
-      sig.bwd <- quantile(sort(min.pvl), sig.bwd0); cat(sig.bwd, "\n")
-    } else {
-      sig.fwd <- sig.fwd0
-      sig.bwd <- sig.bwd0
-    }
     
     if(temp["pv",which.max(temp["st",])] > sig.fwd) {
       qtl.mrk0 <- as.numeric(names(which.max(temp["st",])))

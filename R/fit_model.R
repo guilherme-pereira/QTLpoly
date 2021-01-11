@@ -48,14 +48,14 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Covarrubias-Pazaran G (2016) Genome-assisted prediction of quantitative traits using the R package sommer. \emph{PLoS ONE} 11 (6): 1–15. \url{doi:10.1371/journal.pone.0156744}.
+#'     Covarrubias-Pazaran G (2016) Genome-assisted prediction of quantitative traits using the R package sommer. \emph{PLoS ONE} 11 (6): 1–15. \url{http://doi.org/10.1371/journal.pone.0156744}.
 #' 
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 #'
 #' @export fit_model
 #' @importFrom sommer mmer
 
-fit_model <- function(data, model, probs=c("joint","marginal"), polygenes=c("none","most","all"), keep=TRUE, verbose=TRUE) {
+fit_model <- function(data, model, probs="joint", polygenes="none", keep=TRUE, verbose=TRUE) {
 
   results <- vector("list", length(model$results))
   names(results) <- names(model$results)

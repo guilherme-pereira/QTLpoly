@@ -50,7 +50,7 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi.org/10.1101/622951}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 #'
 #' @export plot_profile
 #' @import ggplot2
@@ -107,15 +107,16 @@ plot_profile <- function(data = data, model = model, pheno.col = NULL, sup.int =
     map <- rbind(map, data.frame(LGS=LGS, POS=data$lgs.all[[c]]))
   }
   if(max(data$lgs.size) > 200) cutx <- 150 else cutx <- 100
-  if(max(lines$SIG[is.finite(lines$SIG)])) cuty <- 2 else cuty <- 4
+  if(max(lines$SIG[is.finite(lines$SIG)]) < 10) cuty <- 2 else cuty <- 4
+  if(data$nlgs > 10) { addx <- 50; linesize <- 1} else { addx <- 10 ; cutx <- 50; linesize <- 1.25}
   
   pl <- ggplot(data = lines, aes(x = POS)) +
     {if(grid) facet_grid(TRT ~ LGS, scales = "free", space = "free", shrink = TRUE) else facet_grid(~ LGS, scales = "free_x", space = "free_x")} +
     {if(nrow(points) > 0 & sup.int) geom_rect(data=points, aes(xmin = INF, xmax = SUP, ymin = -Inf, ymax = Inf, fill = TRT), alpha = 0.2)} +
-    geom_line(data=lines, aes(y = SIG, color = TRT), size=1, alpha=0.8, lineend = "round") +
+    geom_line(data=lines, aes(y = SIG, color = TRT), size=linesize, alpha=0.8, lineend = "round") +
     geom_point(data=map, aes(y=0, x=POS), shape="|", alpha=200/dim(map)[1]) +
     {if(nrow(points) > 0) geom_point(data=points, aes(y = y.dat, color = TRT), shape = 2, size = 2, stroke = 1, alpha = 0.8)} +
-    scale_x_continuous(breaks=seq(0,max(data$lgs.size),cutx), expand = expansion(add=50)) +
+    scale_x_continuous(breaks=seq(0,max(data$lgs.size),cutx), expand = expansion(add=addx)) +
     # {if(!is.null(ylim)) scale_y_continuous(limits = ylim) else scale_y_continuous(limits = c(min(y.dat), 10))} +
     {if(!is.null(ylim)) scale_y_continuous(limits = c(min(y.dat), ylim[2]))} +
     {if(grid) scale_y_continuous(breaks = seq(0, max(lines$SIG[is.finite(lines$SIG)]), cuty), expand = expansion(add=c(0.5, 0.5)))} +

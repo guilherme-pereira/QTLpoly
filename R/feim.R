@@ -52,9 +52,9 @@
 #' @author Guilherme da Silva Pereira, \email{gdasilv@@ncsu.edu}
 #'
 #' @references
-#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+#'     Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 #'
-#'     Hackett, C.A., Bradshaw, J.E., McNicol, J.W. (2001) Interval mapping of quantitative trait loci in autotetraploid species, \emph{Genetics} 159: 1819-1832. \url{http://www.genetics.org/content/159/4/1819}
+#'     Hackett CA, Bradshaw JE, McNicol JW (2001) Interval mapping of quantitative trait loci in autotetraploid species, \emph{Genetics} 159: 1819-1832. \url{http://www.genetics.org/content/159/4/1819}
 #'
 #' @export feim
 
