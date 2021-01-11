@@ -85,7 +85,7 @@ remim <- function(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01, sig.bwd =
   if(!is.null(score.null)) {
     min.pvl <- numeric(length(score.null$results))
     for(p in 1:length(score.null$results)) {
-      min.pvl[p] <- min(score.null$results[[p]]$pval)
+      min.pvl[p] <- score.null$results[[p]]$pval[which.max(score.null$results[[p]]$stat)]
     }        
   } 
   

@@ -82,7 +82,7 @@ search_qtl <- function(data, offset.data = NULL, model, w.size = 15, sig.fwd = 0
   if(!is.null(score.null)) {
     min.pvl <- numeric(length(score.null$results))
     for(p in 1:length(score.null$results)) {
-      min.pvl[p] <- min(score.null$results[[p]]$pval)
+      min.pvl[p] <- score.null$results[[p]]$pval[which.max(score.null$results[[p]]$stat)]
     }        
   } # else if(!is.null(model$min.pvl)) {
   #   min.pvl <- model$min.pvl
