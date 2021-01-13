@@ -27,11 +27,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' data(maps)
+#' data(maps6x)
 #' library(mappoly)
 #' plot(maps)
 #' }
-"maps6x"
+"maps"
 
 #' Simulated phenotypes
 #'
@@ -61,9 +61,9 @@
 #' @examples
 #' \dontrun{
 #' data(pheno6x)
-#' head(pheno6x)
+#' head(pheno)
 #' }
-"pheno6x"
+"pheno"
 
 #' Tetraploid potato genotype probabilities
 #'

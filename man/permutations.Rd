@@ -3,12 +3,23 @@
 \name{permutations}
 \alias{permutations}
 \alias{print.qtlpoly.perm}
+\alias{plot.qtlpoly.perm}
 \title{Fixed-effect interval mapping (FEIM) model permutations}
 \usage{
-permutations(data, pheno.col = NULL, n.sim = 1000, probs = c(0.9,
-  0.95), n.clusters = 1, seed = 123, verbose = TRUE)
+permutations(
+  data,
+  offset.data = NULL,
+  pheno.col = NULL,
+  n.sim = 1000,
+  probs = c(0.9, 0.95),
+  n.clusters = NULL,
+  seed = 123,
+  verbose = TRUE
+)
 
 \method{print}{qtlpoly.perm}(x, pheno.col = NULL, probs = c(0.9, 0.95))
+
+\method{plot}{qtlpoly.perm}(x, pheno.col = NULL, probs = c(0.9, 0.95))
 }
 \arguments{
 \item{data}{an object of class \code{qtlpoly.data}.}
@@ -58,7 +69,7 @@ Stores maximum LOD scores for a number of permutations of given phenotypes.
 \references{
 Churchill GA, Doerge RW (1994) Empirical threshold values for quantitative trait mapping, \emph{Genetics} 138: 963-971. \url{http://www.genetics.org/content/138/3/963}
 
-    Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+    Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 }
 \seealso{
 \code{\link[qtlpoly]{feim}}

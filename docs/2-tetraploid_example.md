@@ -2,7 +2,7 @@
 title: "Multiple QTL Mapping in an Autotetraploid F~1~ population with QTLpoly"
 subtitle: "A toy example from a real potato full-sib family"
 author: "Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng"
-date: "2020-08-24 (last update 2021-01-10)"
+date: "2020-08-24 (last update 2021-01-12)"
 output:
   html_document:
     theme: cerulean
@@ -33,21 +33,25 @@ editor_options:
 
 
 
+# Code
+
+
+
 # Introduction
 
-Quantitative trait loci (QTL) mapping studies help to investigate the genetic architecture of traits of interest. Single- and multiple-QTL models have been available for inbred, diploid mapping populations for quite some time now (see @DaCostaeSilva2010 for a comprehensive review). However, only recently these methods became available for outbred, polyploid mapping populations. 
+Quantitative trait loci (QTL) mapping studies main goal is to investigate the genetic architecture of traits of interest. Single- and multiple-QTL models have been available for inbred, diploid mapping populations for quite some time now (see @DaCostaeSilva2010 for a comprehensive review). However, only recently these methods became available for outbred, polyploid mapping populations. 
 
-The R package `qtlpoly` (v. 0.2.1) is an under development software to map multiple QTL in full-sib families of outcrossing autopolyploid species [@Pereira2020]. It is based on the partition of the phenotypic variance ($\sigma^2_p$) into variance due to QTL ($\sigma^2_q$) in addition to the residual variance ($\sigma^2_e$) as follows:
+The R package `qtlpoly` (v. 0.2.1) is an under development software to map multiple QTL in full-sib families of outcrossing, autopolyploid species [@Pereira2020]. It is based on the partition of the phenotypic variance ($\sigma^2_p$) into variance due to QTL ($\sigma^2_q$) in addition to the residual variance ($\sigma^2_e$) as follows:
 
 $$\sigma^2_p = \sum_{q=1}^Q \boldsymbol{G}^{(i,i')}_q\sigma^2_q + \sigma^2_{e}$$
 
-where $\boldsymbol{G}^{(i,i')}_q$ is the additive relationship between full-sibs $i$ and $i'$, whose computation is based on the genotype conditional probabilities of QTL $q$. See how to estimate these genotype probabilities in @Mollinari2020. 
+where $\boldsymbol{G}^{(i,i')}_q$ is the additive relationship between full-sibs $i$ and $i'$, whose computation is based on the genotype conditional probabilities of QTL $q$. See how to estimate these genotype probabilities using [`mappoly`](https://github.com/mmollina/MAPPoly) in @Mollinari2020. 
 
-Because we only need to estimate one parameter per QTL (the very variance component associated with it), it is relatively easy to look for additional QTL and add them to the variance component model, whitout ending up with an overparameterized model. A multiple-QTL model is known to have increased power when compared to a single-QTL model, with ability to detect minor or separate linked QTL [@Pereira2020].
+Because we only need to estimate one parameter per QTL (the very variance component associated with it), it is relatively easy to look for additional QTL and add them to the variance component model, without ending up with an overparameterized model. A multiple-QTL model is known to have increased power when compared to a single-QTL model, with ability to detect minor or separate linked QTL [@Pereira2020].
 
 Variance components associated with putative QTL ($\sigma^2_q$) are tested using score statistics from the R package `varComp` (v. 0.2-0) [@Qu2013]. Final models are fitted using residual maximum likelihood (REML) from the R package `sommer` (v. 3.6) [@Covarrubias-Pazaran2016]. Plots for visualizing the results are based on `ggplot2` (v. 3.1.0) [@Wickham2016]. 
 
-This tutorial was first developed for the [Polyploid Tools Workshop](https://polyploid.tamu.edu/) (December 12-15, 2021), and tested in R version 4.0.3 (2020-10-10) running on either Ubuntu 18.04.1 LTS (64-bit) or Windows 10.
+This tutorial was first developed for the [Polyploid Tools Training Workshop](https://www.polyploids.org/workshop/2021/january/info) (December 12-15, 2021), and tested in R version 4.0.3 (2020-10-10) running on either Ubuntu 18.04.1 LTS (64-bit) or Windows 10.
 
 ## Installing the `qtlpoly` package
 
@@ -73,7 +77,7 @@ library(qtlpoly)
 
 ## Tetraploid potato data
 
-A cross between two \textit{Solanum tuberosum} clones, 'Atlantic' $\times$ 'B1829-5', resulted in 156 full-sibs. The population has been phenotyped (4-year evaluation) and genotyped (8k SNP array), and analyses have been performed to call SNP dosage, build a genetic map and map QTL [@Pereira2020a]. 
+A cross between two potato (*Solanum tuberosum*, 2*n* = 4*x* = 48) cultivars, 'Atlantic' $\times$ 'B1829-5', resulted in 154 full-sibs. The population has been phenotyped (4-year evaluation) and genotyped (8k SNP array), and analyses have been performed to call SNP dosage, build a genetic map and map QTL [@Pereira2020a]. 
 
 For brevity's sake, we have selected three phenotypes (foliage maturity evaluated in years 2007, 2008 and 2014, i.e. FM07, FM08 and FM14) and three linkage groups (LGs, namely 1, 5 and 7) for this demo. Foliage maturity is measured as the "area under the curve" of foliage color along the plant cycle. All analyses can be found at [this GitHub page](https://github.com/mmollina/B2721_map/), though. 
 
@@ -85,7 +89,7 @@ data("genoprob4x")
 data("pheno4x")
 ```
 
-The `genoprob4x` object contains the genotype probability along the LGs for each indivual, reflecting all recombinations. For example, individuals 1 and 2 show the following patterns of genotype probabilities, and so will every other individual:
+The `genoprob4x` object contains the genotype probability along the LGs for each individual, reflecting all recombination events. For example, individuals 1 and 2 show the following patterns of genotype probabilities, and so will every other individual:
 
 
 ```r
@@ -499,7 +503,7 @@ print(feim.mod)
 
 Remember, in this case, one should not sum adjusted $R^2$ from the same trait, as each was obtained from a single-QTL model.
 
-Finally, one may want to plot the profiles and compare with the [plot profiles] from REMIM:
+Finally, one may want to plot the profiles and compare with the profiles from REMIM:
 
 
 ```r
@@ -508,7 +512,7 @@ plot_profile(data = data, model = feim.mod, grid = TRUE)
 
 <img src="2-tetraploid_example_files/figure-html/unnamed-chunk-25-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
-Notice that one QTL on LG 1 was not detected for the trait 'T32' (false negative), while one QTL on LG 3 for the trait 'T45' was wrongly assigned (false positive). This exemplifies the power of multiple-QTL models over the single-QTL ones. Therefore, the FEIM model may be recommended only as a first, quick approach, but not as the ultimate model for detecting QTL in autopolyploid species. 
+Notice that, in comparison the REMIM results, the QTL on linkage groups 1 and 3 for FM08 are missing.
 
 # Acknowledgments
 

@@ -2,10 +2,18 @@
 % Please edit documentation in R/plot_profile.R
 \name{plot_profile}
 \alias{plot_profile}
-\title{Logarithm of \emph{p}-value (LOP) profile plots}
+\title{Logarithm of \emph{P}-value (LOP) profile plots}
 \usage{
-plot_profile(data = data, model = model, pheno.col = NULL,
-  main = NULL, ylim = NULL, grid = FALSE)
+plot_profile(
+  data = data,
+  model = model,
+  pheno.col = NULL,
+  sup.int = FALSE,
+  main = NULL,
+  legend = "bottom",
+  ylim = NULL,
+  grid = FALSE
+)
 }
 \arguments{
 \item{data}{an object of class \code{qtlpoly.data}.}
@@ -14,7 +22,11 @@ plot_profile(data = data, model = model, pheno.col = NULL,
 
 \item{pheno.col}{a numeric vector with the phenotype column numbers to be plotted; if \code{NULL}, all phenotypes from \code{'data'} will be included.}
 
-\item{main}{a character string with the main title; if \code{NULL}, no title will be shown.}
+\item{sup.int}{if \code{TRUE}, support interval are shown as shaded areas; if \code{FALSE} (default), no support interval is show.}
+
+\item{main}{a character string with the main title; if \code{NULL}, no title is shown.}
+
+\item{legend}{legend position (either "bottom", "top", "left" or "right"); if \code{NULL}, no legend is shown.}
 
 \item{ylim}{a numeric value pair supplying the limits of y-axis, e.g. c(0,10); if \code{NULL} (default), limits will be provided automatically.}
 
@@ -24,7 +36,7 @@ plot_profile(data = data, model = model, pheno.col = NULL,
 A \pkg{ggplot2} with the LOP profiles for each trait.
 }
 \description{
-Plots profiled logarithm of score-based \emph{p}-values (LOP) from individual or combined traits.
+Plots profiled logarithm of score-based \emph{P}-values (LOP) from individual or combined traits.
 }
 \examples{
   \dontrun{
@@ -53,7 +65,7 @@ Plots profiled logarithm of score-based \emph{p}-values (LOP) from individual or
 
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 }
 \seealso{
 \code{\link[qtlpoly]{profile_qtl}},  \code{\link[qtlpoly]{remim}}

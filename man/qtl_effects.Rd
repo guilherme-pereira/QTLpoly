@@ -5,19 +5,18 @@
 \alias{plot.qtlpoly.effects}
 \title{QTL allele effect estimation}
 \usage{
-qtl_effects(ploidy = 6, fitted)
+qtl_effects(ploidy = 6, fitted, pheno.col = NULL, verbose = TRUE)
 
-\method{plot}{qtlpoly.effects}(x, pheno.col = NULL, p1 = "P1",
-  p2 = "P2")
+\method{plot}{qtlpoly.effects}(x, pheno.col = NULL, p1 = "P1", p2 = "P2")
 }
 \arguments{
 \item{ploidy}{a numeric value of ploidy level of the cross (currently, only 4 or 6).}
 
 \item{fitted}{a fitted multiple QTL model of class \code{qtlpoly.fitted}.}
 
-\item{x}{an object of class \code{qtlpoly.effects} to be plotted.}
-
 \item{pheno.col}{a numeric vector with the phenotype column numbers to be plotted; if \code{NULL}, all phenotypes from \code{'fitted'} will be included.}
+
+\item{x}{an object of class \code{qtlpoly.effects} to be plotted.}
 
 \item{p1}{a character string with the first parent name, e.g. \code{"P1"} (default).}
 
@@ -32,7 +31,7 @@ An object of class \code{qtlpoly.effects} which is a list of \code{results} for 
 A \pkg{ggplot2} barplot with parental allele and allele combination effects.
 }
 \description{
-Computes allele specific and allele combination additive effects from multiple QTL models.
+Computes allele specific and allele combination (within-parent) heritable effects from multiple QTL models.
 }
 \examples{
   \dontrun{
@@ -61,7 +60,9 @@ Computes allele specific and allele combination additive effects from multiple Q
   
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
+    
+    Kempthorne O (1955) The correlation between relatives in a simple autotetraploid population, \emph{Genetics} 40: 168-174.
 }
 \seealso{
 \code{\link[qtlpoly]{read_data}}, \code{\link[qtlpoly]{remim}}, \code{\link[qtlpoly]{fit_model}}

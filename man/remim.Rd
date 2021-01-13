@@ -5,10 +5,20 @@
 \alias{print.qtlpoly.remim}
 \title{Random-effect multiple interval mapping (REMIM)}
 \usage{
-remim(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01,
-  sig.bwd = 0.001, d.sint = 1.5, polygenes = FALSE,
-  n.clusters = NULL, n.rounds = Inf, plot = "remim",
-  verbose = TRUE)
+remim(
+  data,
+  pheno.col = NULL,
+  w.size = 15,
+  sig.fwd = 0.01,
+  sig.bwd = 1e-04,
+  score.null = NULL,
+  d.sint = 1.5,
+  polygenes = FALSE,
+  n.clusters = NULL,
+  n.rounds = Inf,
+  plot = "remim",
+  verbose = TRUE
+)
 
 \method{print}{qtlpoly.remim}(x, pheno.col = NULL, sint = NULL)
 }
@@ -22,6 +32,8 @@ remim(data, pheno.col = NULL, w.size = 15, sig.fwd = 0.01,
 \item{sig.fwd}{the desired score-based significance level for forward search, e.g. 0.01 (default).}
 
 \item{sig.bwd}{the desired score-based significance level for backward elimination, e.g. 0.001 (default).}
+
+\item{score.null}{an object of class \code{qtlpoly.null} with results of score statistics from resampling.}
 
 \item{d.sint}{a \eqn{d} value to subtract from logarithm of \emph{p}-value (\eqn{LOP-d}) for support interval calculation, e.g. \eqn{d=1.5} (default) represents approximate 95\% support interval.}
 
@@ -74,9 +86,11 @@ Automatic function that performs REMIM algorithm using score statistics.
 \references{
 Kao CH, Zeng ZB, Teasdale RD (1999) Multiple interval mapping for quantitative trait loci. \emph{Genetics} 152 (3): 1203–16. \url{www.genetics.org/content/152/3/1203}. 
 
-    Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi}.
+    Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
     
-    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
+
+    Zou F, Fine JP, Hu J, Lin DY (2004) An efficient resampling method for assessing genome-wide statistical significance in mapping quantitative trait loci. \emph{Genetics} 168 (4): 2307-16. \url{doi.org/10.1534/genetics.104.031427}
 }
 \seealso{
 \code{\link[qtlpoly]{read_data}}

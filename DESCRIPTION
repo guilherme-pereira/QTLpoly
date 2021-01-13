@@ -15,4 +15,4 @@ Imports:
 Suggests: mappoly, rmarkdown, devtools
 Remotes:
     cran/varComp, mmollina/MAPpoly
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1

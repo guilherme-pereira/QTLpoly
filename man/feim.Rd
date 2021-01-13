@@ -5,8 +5,15 @@
 \alias{print.qtlpoly.feim}
 \title{Fixed-effect interval mapping (FEIM)}
 \usage{
-feim(data = data, pheno.col = NULL, w.size = 15, sig.lod = 7,
-  d.sint = 1.5, plot = "feim", verbose = TRUE)
+feim(
+  data = data,
+  pheno.col = NULL,
+  w.size = 15,
+  sig.lod = 7,
+  d.sint = 1.5,
+  plot = "feim",
+  verbose = TRUE
+)
 
 \method{print}{qtlpoly.feim}(x, pheno.col = NULL, sint = NULL)
 }
@@ -62,9 +69,9 @@ Performs interval mapping using the single-QTL, fixed-effect model proposed by H
 
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 
-    Hackett, C.A., Bradshaw, J.E., McNicol, J.W. (2001) Interval mapping of quantitative trait loci in autotetraploid species, \emph{Genetics} 159: 1819-1832. \url{http://www.genetics.org/content/159/4/1819}
+    Hackett CA, Bradshaw JE, McNicol JW (2001) Interval mapping of quantitative trait loci in autotetraploid species, \emph{Genetics} 159: 1819-1832. \url{http://www.genetics.org/content/159/4/1819}
 }
 \seealso{
 \code{\link[qtlpoly]{permutations}}

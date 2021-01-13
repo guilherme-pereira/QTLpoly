@@ -5,13 +5,21 @@
 \alias{print.qtlpoly.null}
 \title{Null model}
 \usage{
-null_model(data, pheno.col = NULL, n.clusters = NULL, plot = "null",
-  verbose = TRUE)
+null_model(
+  data,
+  offset.data = NULL,
+  pheno.col = NULL,
+  n.clusters = NULL,
+  plot = "null",
+  verbose = TRUE
+)
 
 \method{print}{qtlpoly.null}(x, pheno.col = NULL)
 }
 \arguments{
 \item{data}{an object of class \code{qtlpoly.data}.}
+
+\item{offset.data}{a data frame with the same dimensions of \code{data$pheno} containing offset variables; if \code{NULL} (default), no offset variables are considered.}
 
 \item{pheno.col}{a numeric vector with the phenotype columns to be analyzed; if \code{NULL}, all phenotypes from \code{'data'} will be included.}
 
@@ -53,9 +61,9 @@ Creates a null model (with no QTL) for each trait.
 
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
     
-    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
 }
 \seealso{
 \code{\link[qtlpoly]{read_data}}

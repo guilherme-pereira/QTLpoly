@@ -3,10 +3,17 @@
 \name{read_data}
 \alias{read_data}
 \alias{print.qtlpoly.data}
-\title{Read data}
+\title{Read genotypic and phenotypic data}
 \usage{
-read_data(ploidy = 6, geno.prob = genoprob, pheno = pheno,
-  step = 1)
+read_data(
+  ploidy = 6,
+  geno.prob = genoprob,
+  geno.dose = NULL,
+  double.reduction = FALSE,
+  pheno = pheno,
+  weights = NULL,
+  step = 1
+)
 
 \method{print}{qtlpoly.data}(x, detailed = FALSE)
 }
@@ -15,7 +22,13 @@ read_data(ploidy = 6, geno.prob = genoprob, pheno = pheno,
 
 \item{geno.prob}{an object of class \code{mappoly.genoprob} from \pkg{mappoly}.}
 
-\item{pheno}{a data frame of phenotypes (columns) with individual names (rows) identical to individual names in \code{geno.prob} object.}
+\item{geno.dose}{an object of class \code{mappoly.data} from \pkg{mappoly}.}
+
+\item{double.reduction}{if \code{TRUE}, double reduction genotypes are taken into account; if \code{FALSE}, no double reduction genotypes are considered.}
+
+\item{pheno}{a data frame of phenotypes (columns) with individual names (rows) identical to individual names in \code{geno.prob} and/or \code{geno.dose} object.}
+
+\item{weights}{a data frame of phenotype weights (columns) with individual names (rows) identical to individual names in \code{pheno} object.}
 
 \item{step}{a numeric value of step size (in centiMorgans) where tests will be performed, e.g. 1 (default); if \code{NULL}, tests will be performed at every marker.}
 
@@ -62,7 +75,7 @@ Reads files in specific formats and creates a \code{qtlpoly.data} object to be u
   }
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 }
 \seealso{
 \code{\link[mappoly]{read_data}}, \code{\link[qtlpoly]{maps}}, \code{\link[qtlpoly]{pheno}}

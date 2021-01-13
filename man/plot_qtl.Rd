@@ -4,8 +4,15 @@
 \alias{plot_qtl}
 \title{QTL heritability and significance plot}
 \usage{
-plot_qtl(data = data, model = model, fitted = fitted,
-  pheno.col = NULL, main = NULL, drop = FALSE)
+plot_qtl(
+  data = data,
+  model = model,
+  fitted = fitted,
+  pheno.col = NULL,
+  main = NULL,
+  drop.pheno = TRUE,
+  drop.lgs = TRUE
+)
 }
 \arguments{
 \item{data}{an object of class \code{qtlpoly.data}.}
@@ -18,7 +25,9 @@ plot_qtl(data = data, model = model, fitted = fitted,
 
 \item{main}{plot title; if \code{NULL} (the default), no title is shown.}
 
-\item{drop}{if \code{FALSE}, shows the names of all traits from \code{pheno.col}, even of those with no QTLs; if \code{TRUE} (the default), shows only the traits with QTL(s).}
+\item{drop.pheno}{if \code{FALSE}, shows the names of all traits from \code{pheno.col}, even of those with no QTLs; if \code{TRUE} (the default), shows only the traits with QTL(s).}
+
+\item{drop.lgs}{if \code{FALSE}, shows all linkage groups, even those with no QTL; if \code{TRUE} (the default), shows only the linkage groups with QTL(s).}
 }
 \value{
 A \pkg{ggplot2} with dots representing the QTLs.
@@ -51,7 +60,7 @@ Creates a plot where dot sizes and colors represent the QTLs heritabilities and 
   }
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 }
 \seealso{
 \code{\link[qtlpoly]{read_data}}, \code{\link[qtlpoly]{remim}}, \code{\link[qtlpoly]{fit_model}}

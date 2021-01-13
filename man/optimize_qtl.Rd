@@ -5,17 +5,30 @@
 \alias{print.qtlpoly.optimize}
 \title{Model optimization}
 \usage{
-optimize_qtl(data, model, sig.bwd = 1e-04, polygenes = FALSE,
-  n.clusters = NULL, plot = "optimize", verbose = TRUE)
+optimize_qtl(
+  data,
+  offset.data = NULL,
+  model,
+  sig.bwd = 0.05,
+  score.null = NULL,
+  polygenes = FALSE,
+  n.clusters = NULL,
+  plot = "optimize",
+  verbose = TRUE
+)
 
 \method{print}{qtlpoly.optimize}(x, pheno.col = NULL)
 }
 \arguments{
 \item{data}{an object of class \code{qtlpoly.data}.}
 
+\item{offset.data}{a data frame with the same dimensions of \code{data$pheno} containing offset variables; if \code{NULL} (default), no offset variables are considered.}
+
 \item{model}{an object of class \code{qtlpoly.model} containing the QTL to be optimized.}
 
 \item{sig.bwd}{the desired score-based \emph{p}-value threshold for backward elimination, e.g. 0.0001 (default).}
+
+\item{score.null}{an object of class \code{qtlpoly.null} with results of score statistics from resampling.}
 
 \item{polygenes}{if \code{TRUE} all QTL but the one being tested are treated as a single polygenic effect, if \code{FALSE} (default) all QTL effect variances have to estimated.}
 
@@ -67,9 +80,11 @@ Tests each QTL at a time and updates its position (if it changes) or drops the Q
 
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
     
-    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
+
+    Zou F, Fine JP, Hu J, Lin DY (2004) An efficient resampling method for assessing genome-wide statistical significance in mapping quantitative trait loci. \emph{Genetics} 168 (4): 2307-16. \url{doi.org/10.1534/genetics.104.031427}
 }
 \seealso{
 \code{\link[qtlpoly]{read_data}}, \code{\link[qtlpoly]{null_model}}, \code{\link[qtlpoly]{search_qtl}}

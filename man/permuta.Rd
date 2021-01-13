@@ -4,7 +4,13 @@
 \alias{permuta}
 \title{Compute LOD score from a simulated phenotype using fixed-effect interval mapping (FEIM) model}
 \usage{
-permuta(x, data = data, pheno.col = pheno.col, p = p)
+permuta(
+  x,
+  data = data,
+  offset.data = offset.data,
+  pheno.col = pheno.col,
+  p = p
+)
 }
 \arguments{
 \item{x}{an array with the number of simulations}

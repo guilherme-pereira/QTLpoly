@@ -5,20 +5,34 @@
 \alias{print.qtlpoly.search}
 \title{QTL forward search}
 \usage{
-search_qtl(data, model, w.size = 15, sig.fwd = 0.01,
-  polygenes = FALSE, n.rounds = Inf, n.clusters = NULL,
-  plot = "search", verbose = TRUE)
+search_qtl(
+  data,
+  offset.data = NULL,
+  model,
+  w.size = 15,
+  sig.fwd = 0.2,
+  score.null = NULL,
+  polygenes = FALSE,
+  n.rounds = Inf,
+  n.clusters = NULL,
+  plot = "search",
+  verbose = TRUE
+)
 
 \method{print}{qtlpoly.search}(x, pheno.col = NULL)
 }
 \arguments{
 \item{data}{an object of class \code{qtlpoly.data}.}
 
+\item{offset.data}{a data frame with the same dimensions of \code{data$pheno} containing offset variables; if \code{NULL} (default), no offset variables are considered.}
+
 \item{model}{an object of class \code{qtlpoly.model} from which a forward search will start.}
 
 \item{w.size}{the window size (in cM) to avoid on either side of QTL already in the model when looking for a new QTL.}
 
 \item{sig.fwd}{the desired score-based \emph{p}-value threshold for forward search, e.g. 0.01 (default).}
+
+\item{score.null}{an object of class \code{qtlpoly.null} with results of score statistics from resampling.}
 
 \item{polygenes}{if \code{TRUE} all QTL but the one being tested are treated as a single polygenic effect; if \code{FALSE} (default) all QTL effect variances have to estimated.}
 
@@ -68,9 +82,11 @@ Searches for QTL and adds them one at a time to a multiple random-effect QTL mod
 
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
     
-    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi:10.1111/biom.12095}.
+    Qu L, Guennel T, Marshall SL (2013) Linear score tests for variance components in linear mixed models and applications to genetic association studies. \emph{Biometrics} 69 (4): 883–92. \url{doi.org/10.1111/biom.12095}.
+
+    Zou F, Fine JP, Hu J, Lin DY (2004) An efficient resampling method for assessing genome-wide statistical significance in mapping quantitative trait loci. \emph{Genetics} 168 (4): 2307-16. \url{doi.org/10.1534/genetics.104.031427}
 }
 \seealso{
 \code{\link[qtlpoly]{read_data}}, \code{\link[qtlpoly]{null_model}}

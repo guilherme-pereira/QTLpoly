@@ -4,27 +4,29 @@
 \name{pheno}
 \alias{pheno}
 \title{Simulated phenotypes}
-\format{A data frame of phenotypes with 300 named individuals in rows and three named phenotypes in columns, which are:
+\format{
+A data frame of phenotypes with 300 named individuals in rows and three named phenotypes in columns, which are:
 
 \describe{
   \item{T32}{3 QTLs, with heritabilities of 0.20 (LG 1 at 32.03 cM), 0.15 (LG 1 at 95.02 cM) and 0.30 (LG 2 at 40.01 cM).}
   \item{T17}{1 QTL, with heritability of 0.15 (LG 3 at 34.51 cM).}
   \item{T45}{no QTLs.}
-}}
+}
+}
 \usage{
-data(pheno)
+data(pheno6x)
 }
 \description{
 A simulated data set of phenotypes for a hipotetical autohexaploid species map.
 }
 \examples{
 \dontrun{
-data(pheno)
+data(pheno6x)
 head(pheno)
 }
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 }
 \seealso{
 \code{\link[qtlpoly]{simulate_qtl}}, \code{\link[qtlpoly]{pheno}}

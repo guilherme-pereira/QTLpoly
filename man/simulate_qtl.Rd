@@ -5,8 +5,18 @@
 \alias{print.qtlpoly.simul}
 \title{Simulations of multiple QTL}
 \usage{
-simulate_qtl(data, mu = 0, h2.qtl = c(0.3, 0.2, 0.1), var.error = 1,
-  n.sim = 1000, w.size = 20, seed = 123, verbose = TRUE)
+simulate_qtl(
+  data,
+  mu = 0,
+  h2.qtl = c(0.3, 0.2, 0.1),
+  var.error = 1,
+  linked = FALSE,
+  n.sim = 1000,
+  missing = TRUE,
+  w.size = 20,
+  seed = 123,
+  verbose = TRUE
+)
 
 \method{print}{qtlpoly.simul}(x, detailed = FALSE)
 }
@@ -15,13 +25,17 @@ simulate_qtl(data, mu = 0, h2.qtl = c(0.3, 0.2, 0.1), var.error = 1,
 
 \item{mu}{simulated phenotype mean, e.g. 0 (default).}
 
-\item{h2.qtl}{vector with QTL heritabilities, e.g. c(0.3, 0.2, 0.1) for three QTL (default).}
+\item{h2.qtl}{vector with QTL heritabilities, e.g. \code{c(0.3, 0.2, 0.1)} for three QTL (default); if \code{NULL}, only error is simulated.}
 
 \item{var.error}{simulated error variance, e.g. 1 (default).}
 
+\item{linked}{if \code{TRUE} (default), at least two QTL will be linked; if \code{FALSE}, QTL will be randomly assigned along the genetic map. Linkage is defined by a genetic distance smaller than the selected \code{w.size}.}
+
 \item{n.sim}{number of simulations, e.g. 1000 (default).}
 
-\item{w.size}{the window size (in centiMorgans) to avoid on either side of QTL already in the model when looking selecting new QTL, e.g. 20 (default).}
+\item{missing}{if \code{TRUE} (default), phenotypes are simulated with the same number of missing data observed in \code{data$pheno}.}
+
+\item{w.size}{the window size (in centiMorgans) between two (linked) QTL, e.g. 20 (default).}
 
 \item{seed}{integer for the \code{set.seed()} function.}
 
@@ -56,7 +70,7 @@ Simulate new phenotypes with a given number of QTL and creates new object with t
 
 }
 \references{
-Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2019) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{bioRxiv}. \url{doi:}.
+Pereira GS, Gemenet DC, Mollinari M, Olukolu BA, Wood JC, Mosquera V, Gruneberg WJ, Khan A, Buell CR, Yencho GC, Zeng ZB (2020) Multiple QTL mapping in autopolyploids: a random-effect model approach with application in a hexaploid sweetpotato full-sib population, \emph{Genetics} 215 (3): 579-595. \url{http://doi.org/10.1534/genetics.120.303080}.
 }
 \seealso{
 \code{\link[qtlpoly]{read_data}}
