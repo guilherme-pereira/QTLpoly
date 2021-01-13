@@ -32,41 +32,43 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE, cache = TRUE, echo = TRUE, results = 'hold', collapse = TRUE, tidy.opts = list(width.cutoff=75), tidy = TRUE, fig.width = 6, fig.height = 5, out.width = '70%', out.height = '70%', dpi = 150, fig.align = 'center', fig.ncol = 1, prompt = FALSE)
+knitr::opts_chunk$set(eval = TRUE, cache = TRUE, echo = TRUE, collapse = TRUE, tidy.opts = list(width.cutoff=75), tidy = TRUE, fig.width = 6, fig.height = 5, out.width = '70%', out.height = '70%', dpi = 150, fig.align = 'center', fig.ncol = 1, prompt = FALSE)
 ```
 
-# Code
+# Short code for demo
 
 ```{r, eval=FALSE}
-# Load package and data
+## Load package and data
 library(qtlpoly)
 data("genoprob4x"); length(genoprob4x)
 data("pheno4x"); head(pheno4x)
 
-# Read data to an object
+## Read data to an object
 data <- read_data(ploidy = 4, geno.prob = genoprob4x, pheno = pheno4x, step = 1)
 print(data, detailed = TRUE)
 
-# Detect QTL (one needs to run the score-based resampling method before proceding)
-remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0.0002284465, d.sint = 1.5, n.clusters = 6, plot = "remim4x")
+## Detect QTL. One needs to run the score-based resampling method before proceding. Change pheno.col = c(1:3) and increase n.clusters if you believe your computer can handle it
+sig.fwd <- 0.0011493379
+sig.bwd <- 0.0002284465
+remim.mod <- remim(data = data, pheno.col = 1, w.size = 15, sig.fwd = sig.fwd, sig.bwd = sig.bwd, d.sint = 1.5, n.clusters = 1, plot = "remim4x")
 print(remim.mod)
 plot_profile(data = data, model = remim.mod, grid = TRUE)
 plot_sint(data = data, model = remim.mod)
 
-# Fit final QTL model
+## Fit final QTL model
 fitted.mod <- fit_model(data = data, model = remim.mod)
 summary(fitted.mod)
 plot_qtl(data = data, model = remim.mod, fitted = fitted.mod)
 
-# Estimate allele effects
+## Estimate allele effects
 est.effects <- qtl_effects(ploidy = 4, fitted = fitted.mod)
 plot(est.effects, p1 = "Atlantic", p2 = "B1829-5")
 
-# Predict QTL-based breeding values
+## Predict QTL-based breeding values
 y.hat <- breeding_values(data = data, fitted = fitted.mod)
 plot(y.hat)
 
-# Run FEIM for comparison (one needs to run permutation before proceding)
+## Run FEIM for comparison. One needs to run permutation before proceding
 feim.mod <- feim(data = data, w.size = 15, sig.lod = c(5.68, 5.78, 5.60))
 print(feim.mod)
 plot_profile(data = data, model = feim.mod, grid = TRUE)
@@ -176,7 +178,7 @@ for(p in 1:length(score.null$results)) {
 quantile(sort(min.pvl), c(0.20, 0.05))
 ```
 
-Therefore, we ran it in advance and learned that genome-wide significance levels of $\alpha=0.20$ and $\alpha=0.05$ match $P < `r quantile(sort(min.pvl), 0.20)`$ and $P < `r quantile(sort(min.pvl), 0.05)`$, respectively, which will be used next.
+Therefore, we ran it in advance and learned that genome-wide significance levels of $\alpha=0.20$ and $\alpha=0.05$ match $P < `r quantile(sort(min.pvl), 0.20)`$ and $P < `r quantile(sort(min.pvl), 0.05)`$, respectively, which will be used next. Remember you are supposed to run the resampling method for all the 12 linkage groups together (for our potato example).
 
 ## Searching for QTL
 
@@ -190,7 +192,7 @@ remim.mod <- remim(data = data, w.size = 15, score.null = score.null, sig.fwd = 
 
 Otherwise, you can just include the pointwise significance level computed before based on our resampling method, which is the option we are going to use here:
 
-```{r}
+```{r, results = 'hold'}
 remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0.0002284465, d.sint = 1.5, n.clusters = 6, plot = "remim4x")
 ```
 
@@ -305,7 +307,7 @@ perm <- permutations(data = data, n.sim = 1000, n.clusters = 6)
 print(perm)
 ```
 
-Since it takes some time to run all permutations, we will use the information previously obtained for $\alpha = 0.05$, i.e. 95\% quantile, in the subsequent FEIM analyses.
+Since it takes some time to run all permutations, we will use the information previously obtained for $\alpha = 0.05$, i.e. 95\% quantile, in the subsequent FEIM analyses. Remember you are supposed to run the permutation method for all the 12 linkage groups together (for our potato example).
 
 ## Interval mapping
 

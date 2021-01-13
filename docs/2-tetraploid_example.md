@@ -2,7 +2,7 @@
 title: "Multiple QTL Mapping in an Autotetraploid F~1~ population with QTLpoly"
 subtitle: "A toy example from a real potato full-sib family"
 author: "Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng"
-date: "2020-08-24 (last update 2021-01-12)"
+date: "2020-08-24 (last update 2021-01-13)"
 output:
   html_document:
     theme: cerulean
@@ -33,43 +33,46 @@ editor_options:
 
 
 
-# Code
+# Short code for demo
 
 
 ```r
-# Load package and data
+## Load package and data
 library(qtlpoly)
 data("genoprob4x")
 length(genoprob4x)
 data("pheno4x")
 head(pheno4x)
 
-# Read data to an object
+## Read data to an object
 data <- read_data(ploidy = 4, geno.prob = genoprob4x, pheno = pheno4x, step = 1)
 print(data, detailed = TRUE)
 
-# Detect QTL (one needs to run the score-based resampling method before
-# proceding)
-remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0.0002284465, 
-    d.sint = 1.5, n.clusters = 6, plot = "remim4x")
+## Detect QTL. One needs to run the score-based resampling method before
+## proceding. Change pheno.col = c(1:3) and increase n.clusters if you
+## believe your computer can handle it
+sig.fwd <- 0.0011493379
+sig.bwd <- 0.0002284465
+remim.mod <- remim(data = data, pheno.col = 1, w.size = 15, sig.fwd = sig.fwd, 
+    sig.bwd = sig.bwd, d.sint = 1.5, n.clusters = 1, plot = "remim4x")
 print(remim.mod)
 plot_profile(data = data, model = remim.mod, grid = TRUE)
 plot_sint(data = data, model = remim.mod)
 
-# Fit final QTL model
+## Fit final QTL model
 fitted.mod <- fit_model(data = data, model = remim.mod)
 summary(fitted.mod)
 plot_qtl(data = data, model = remim.mod, fitted = fitted.mod)
 
-# Estimate allele effects
+## Estimate allele effects
 est.effects <- qtl_effects(ploidy = 4, fitted = fitted.mod)
 plot(est.effects, p1 = "Atlantic", p2 = "B1829-5")
 
-# Predict QTL-based breeding values
+## Predict QTL-based breeding values
 y.hat <- breeding_values(data = data, fitted = fitted.mod)
 plot(y.hat)
 
-# Run FEIM for comparison (one needs to run permutation before proceding)
+## Run FEIM for comparison. One needs to run permutation before proceding
 feim.mod <- feim(data = data, w.size = 15, sig.lod = c(5.68, 5.78, 5.6))
 print(feim.mod)
 plot_profile(data = data, model = feim.mod, grid = TRUE)
@@ -162,7 +165,6 @@ The function `read_data()` reads both 'genoprob' and 'pheno' objects, together w
 
 ```r
 data <- read_data(ploidy = 4, geno.prob = genoprob4x, pheno = pheno4x, step = 1)
-print(data, detailed = TRUE)
 ## Reading the following data: 
 ##   Ploidy level:       4
 ##   No. individuals:    156
@@ -170,6 +172,7 @@ print(data, detailed = TRUE)
 ##   Step size:          1 cM 
 ##   Map size:           438.17 cM (443 positions) 
 ##   No. phenotypes:     3
+print(data, detailed = TRUE)
 ## This is an object of class 'qtlpoly.data'
 ##   Ploidy level:       4
 ##   No. individuals:    156
@@ -216,7 +219,7 @@ quantile(sort(min.pvl), c(0.2, 0.05))
 ## 0.0011493379 0.0002284465
 ```
 
-Therefore, we ran it in advance and learned that genome-wide significance levels of $\alpha=0.20$ and $\alpha=0.05$ match $P < 0.0011493$ and $P < 2.2844648\times 10^{-4}$, respectively, which will be used next.
+Therefore, we ran it in advance and learned that genome-wide significance levels of $\alpha=0.20$ and $\alpha=0.05$ match $P < 0.0011493$ and $P < 2.2844648\times 10^{-4}$, respectively, which will be used next. Remember you are supposed to run the resampling method for all the 12 linkage groups together (for our potato example).
 
 ## Searching for QTL
 
@@ -244,7 +247,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 1 at 8 cM (position number 9) did not reach the threshold; its p-value was 0.04462
 ##   Refining QTL positions ... 234 ... 382 
 ##   Profiling QTL ... 234 ... 382 
-##   Calculation took 215.85 seconds
+##   Calculation took 260.94 seconds
 ## 
 ## REMIM for trait 2 'FM08' 
 ##   QTL was found on LG 2 at 27 cM (position number 235)
@@ -253,7 +256,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 3 at 110 cM (position number 426) did not reach the threshold; its p-value was 0.00419
 ##   Refining QTL positions ... 236 ... 381 ... 10 
 ##   Profiling QTL ... 10 ... 235 ... 381 
-##   Calculation took 395.62 seconds
+##   Calculation took 455.99 seconds
 ## 
 ## REMIM for trait 3 'FM14' 
 ##   QTL was found on LG 2 at 26 cM (position number 234)
@@ -261,7 +264,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 3 at 2 cM (position number 318) did not reach the threshold; its p-value was 0.08978
 ##   Refining QTL positions ... 226 ... 382 
 ##   Profiling QTL ... 226 ... 382 
-##   Calculation took 170.72 seconds
+##   Calculation took 190.48 seconds
 ```
 
 Use `print()` and a summary table for each trait will be shown:
@@ -494,7 +497,7 @@ print(perm)
 ## 5.2 5.6
 ```
 
-Since it takes some time to run all permutations, we will use the information previously obtained for $\alpha = 0.05$, i.e. 95\% quantile, in the subsequent FEIM analyses.
+Since it takes some time to run all permutations, we will use the information previously obtained for $\alpha = 0.05$, i.e. 95\% quantile, in the subsequent FEIM analyses. Remember you are supposed to run the permutation method for all the 12 linkage groups together (for our potato example).
 
 ## Interval mapping
 
@@ -506,15 +509,12 @@ feim.mod <- feim(data = data, w.size = 15, sig.lod = c(5.68, 5.78, 5.6))
 ## FEIM for trait 1 'FM07' 
 ##   QTL was found on LG 2 at 26 cM (position number 234)
 ##   QTL was found on LG 3 at 66 cM (position number 382)
-## 
 ## FEIM for trait 2 'FM08' 
 ##   QTL was found on LG 2 at 28 cM (position number 236)
-## 
 ## FEIM for trait 3 'FM14' 
 ##   QTL was found on LG 2 at 26 cM (position number 234)
 ##   QTL was found on LG 3 at 66 cM (position number 382)
-## 
-## Calculation took 2.69 seconds
+## Calculation took 3.75 seconds
 ```
 
 A `print` function shows detailed information on the detected QTL:
