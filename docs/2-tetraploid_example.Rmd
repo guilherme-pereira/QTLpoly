@@ -47,9 +47,7 @@ data("pheno4x"); head(pheno4x)
 data <- read_data(ploidy = 4, geno.prob = genoprob4x, pheno = pheno4x, step = 1)
 print(data, detailed = TRUE)
 
-# Run resampling method 
-
-# Detect QTL
+# Detect QTL (one needs to run the score-based resampling method before proceding)
 remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0.0002284465, d.sint = 1.5, n.clusters = 6, plot = "remim4x")
 print(remim.mod)
 plot_profile(data = data, model = remim.mod, grid = TRUE)
@@ -68,7 +66,7 @@ plot(est.effects, p1 = "Atlantic", p2 = "B1829-5")
 y.hat <- breeding_values(data = data, fitted = fitted.mod)
 plot(y.hat)
 
-# Run FEIM for comparison 
+# Run FEIM for comparison (one needs to run permutation before proceding)
 feim.mod <- feim(data = data, w.size = 15, sig.lod = c(5.68, 5.78, 5.60))
 print(feim.mod)
 plot_profile(data = data, model = feim.mod, grid = TRUE)

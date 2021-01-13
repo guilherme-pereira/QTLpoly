@@ -36,6 +36,44 @@ editor_options:
 # Code
 
 
+```r
+# Load package and data
+library(qtlpoly)
+data("genoprob4x")
+length(genoprob4x)
+data("pheno4x")
+head(pheno4x)
+
+# Read data to an object
+data <- read_data(ploidy = 4, geno.prob = genoprob4x, pheno = pheno4x, step = 1)
+print(data, detailed = TRUE)
+
+# Detect QTL (one needs to run the score-based resampling method before
+# proceding)
+remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0.0002284465, 
+    d.sint = 1.5, n.clusters = 6, plot = "remim4x")
+print(remim.mod)
+plot_profile(data = data, model = remim.mod, grid = TRUE)
+plot_sint(data = data, model = remim.mod)
+
+# Fit final QTL model
+fitted.mod <- fit_model(data = data, model = remim.mod)
+summary(fitted.mod)
+plot_qtl(data = data, model = remim.mod, fitted = fitted.mod)
+
+# Estimate allele effects
+est.effects <- qtl_effects(ploidy = 4, fitted = fitted.mod)
+plot(est.effects, p1 = "Atlantic", p2 = "B1829-5")
+
+# Predict QTL-based breeding values
+y.hat <- breeding_values(data = data, fitted = fitted.mod)
+plot(y.hat)
+
+# Run FEIM for comparison (one needs to run permutation before proceding)
+feim.mod <- feim(data = data, w.size = 15, sig.lod = c(5.68, 5.78, 5.6))
+print(feim.mod)
+plot_profile(data = data, model = feim.mod, grid = TRUE)
+```
 
 # Introduction
 
@@ -102,7 +140,7 @@ for (i in 1:3) {
 }
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-4-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-5-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 The `pheno4x` object contains the phenotypic values of foliage maturity for years 2007, 2008 and 2014:
 
@@ -113,7 +151,7 @@ ggplot() + geom_boxplot(data = stack(as.data.frame(pheno4x)), aes(x = ind, y = v
     color = ind)) + xlab("Trait") + theme(legend.position = "none")
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-5-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-6-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 In a region where a QTL exists, the more alleles a pair of individuals share, the more their phenotypes will look alike. In fact, this is the basis of QTL detection.
 
@@ -206,7 +244,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 1 at 8 cM (position number 9) did not reach the threshold; its p-value was 0.04462
 ##   Refining QTL positions ... 234 ... 382 
 ##   Profiling QTL ... 234 ... 382 
-##   Calculation took 174.14 seconds
+##   Calculation took 215.85 seconds
 ## 
 ## REMIM for trait 2 'FM08' 
 ##   QTL was found on LG 2 at 27 cM (position number 235)
@@ -215,7 +253,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 3 at 110 cM (position number 426) did not reach the threshold; its p-value was 0.00419
 ##   Refining QTL positions ... 236 ... 381 ... 10 
 ##   Profiling QTL ... 10 ... 235 ... 381 
-##   Calculation took 385.53 seconds
+##   Calculation took 395.62 seconds
 ## 
 ## REMIM for trait 3 'FM14' 
 ##   QTL was found on LG 2 at 26 cM (position number 234)
@@ -223,7 +261,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 3 at 2 cM (position number 318) did not reach the threshold; its p-value was 0.08978
 ##   Refining QTL positions ... 226 ... 382 
 ##   Profiling QTL ... 226 ... 382 
-##   Calculation took 172.41 seconds
+##   Calculation took 170.72 seconds
 ```
 
 Use `print()` and a summary table for each trait will be shown:
@@ -305,13 +343,13 @@ Given the final profiled models, you can plot either individual or joint $LOP$ p
 plot_profile(data = data, model = remim.mod, grid = TRUE)
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-13-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-14-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 ```r
 plot_profile(data = data, model = remim.mod, grid = FALSE)
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-13-2.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-14-2.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 The argument `grid` organizes the multiple plots as a grid if `TRUE`, or superimposed profiles if `FALSE`.
 
@@ -322,7 +360,7 @@ You can visualize the QTL distributed along the linkage map, together with their
 plot_sint(data = data, model = remim.mod)
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-14-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-15-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 # Fitting multiple QTL models
 
@@ -372,11 +410,11 @@ Another way of visualization you can use is the one provided by the function `pl
 plot_qtl(data = data, model = remim.mod, fitted = fitted.mod)
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-17-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-18-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 Dots are located on the respective LG positions of the QTL peaks. Size of the dots corresponds to the specific QTL heritability. Color of the dots corresponds to the $P$-values, and helps to identify the most or the less significant QTL. 
 
-## Estimate allele effects
+## Estimating allele effects
 
 Additive effects contributing to the overall mean by each allele individually as well as their combinations within each parent may be computed using the function `qtl_effects()` as follows:
 
@@ -397,11 +435,11 @@ A `plot()` function allows the user to visualize these contributions graphically
 plot(est.effects, p1 = "Atlantic", p2 = "B1829-5")
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-19-1.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-19-2.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-19-3.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-19-4.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-19-5.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-19-6.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-19-7.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-20-1.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-20-2.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-20-3.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-20-4.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-20-5.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-20-6.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-20-7.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 For each QTL, one will be able to see which alleles contribute the most to increase or decrease the phenotypic mean. For example, for QTL on LG 2, alleles *b* from 'Atlantic' and *f* and *h* from 'B1829-5' contributes to increasing the area under the curve and, thus, to decreasing maturity time.
 
-## Predict breeding values
+## Predicting breeding values
 
 Finally, with the estimates of the final models in hands, one can use them to perform predictions of the QTL-based breeding values as follows:
 
@@ -417,7 +455,7 @@ A `plot()` function shows the distribution of the genotypic values for the popul
 plot(y.hat)
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-21-1.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-21-2.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-21-3.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-22-1.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-22-2.png" width="70%" height="70%" style="display: block; margin: auto;" /><img src="2-tetraploid_example_files/figure-html/unnamed-chunk-22-3.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 This may also be interesting for those populations whose individuals have been genotyped, but not phenotyped, and you still want to consider them when selecting the best genotypes.
 
@@ -476,7 +514,7 @@ feim.mod <- feim(data = data, w.size = 15, sig.lod = c(5.68, 5.78, 5.6))
 ##   QTL was found on LG 2 at 26 cM (position number 234)
 ##   QTL was found on LG 3 at 66 cM (position number 382)
 ## 
-## Calculation took 1.99 seconds
+## Calculation took 2.69 seconds
 ```
 
 A `print` function shows detailed information on the detected QTL:
@@ -510,7 +548,7 @@ Finally, one may want to plot the profiles and compare with the profiles from RE
 plot_profile(data = data, model = feim.mod, grid = TRUE)
 ```
 
-<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-25-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
+<img src="2-tetraploid_example_files/figure-html/unnamed-chunk-26-1.png" width="70%" height="70%" style="display: block; margin: auto;" />
 
 Notice that, in comparison the REMIM results, the QTL on linkage groups 1 and 3 for FM08 are missing.
 
