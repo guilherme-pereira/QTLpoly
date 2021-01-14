@@ -1585,7 +1585,7 @@ div.tocify {
 <h1 class="title toc-ignore">Multiple QTL Mapping in an Autotetraploid F<sub>1</sub> population with QTLpoly</h1>
 <h3 class="subtitle">A toy example from a real potato full-sib family</h3>
 <h4 class="author">Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng</h4>
-<h4 class="date">2020-08-24 (last update 2021-01-13)</h4>
+<h4 class="date">2020-08-24 (last update 2021-01-14)</h4>
 
 </div>
 
@@ -1610,7 +1610,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-15" title="15">sig.fwd &lt;-<span class="st"> </span><span class="fl">0.0011493379</span>  <span class="co"># 20% genome-wide significance level</span></a>
 <a class="sourceLine" id="cb1-16" title="16">sig.bwd &lt;-<span class="st"> </span><span class="fl">0.0002284465</span>  <span class="co"># 5% genome-wide significance level</span></a>
 <a class="sourceLine" id="cb1-17" title="17">remim.mod &lt;-<span class="st"> </span><span class="kw">remim</span>(<span class="dt">data =</span> data, <span class="dt">pheno.col =</span> <span class="dv">1</span>, <span class="dt">w.size =</span> <span class="dv">15</span>, <span class="dt">sig.fwd =</span> sig.fwd, </a>
-<a class="sourceLine" id="cb1-18" title="18">    <span class="dt">sig.bwd =</span> sig.bwd, <span class="dt">d.sint =</span> <span class="fl">1.5</span>, <span class="dt">n.clusters =</span> <span class="dv">1</span>, <span class="dt">plot =</span> <span class="st">&quot;remim4x&quot;</span>)</a>
+<a class="sourceLine" id="cb1-18" title="18">    <span class="dt">sig.bwd =</span> sig.bwd, <span class="dt">d.sint =</span> <span class="fl">1.5</span>, <span class="dt">n.clusters =</span> <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb1-19" title="19"><span class="kw">print</span>(remim.mod)</a>
 <a class="sourceLine" id="cb1-20" title="20"><span class="kw">plot_profile</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> remim.mod, <span class="dt">grid =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb1-21" title="21"><span class="kw">plot_sint</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> remim.mod)</a>
@@ -1735,10 +1735,10 @@ div.tocify {
 <p>Now, we are to use the <code>remim</code> function for building our multiple QTL model. One should include the <code>data</code> object, the window size (<code>w.size = 15</code>), the value <span class="math inline">\(d\)</span> that is decreased from the log of <span class="math inline">\(P\)</span>-value to compute the support interval (<code>d.sint = 1.5</code> for ~95%), and the number of cores to be used (<code>n.clusters = 6</code>).</p>
 <p>In case you have computed the ‘score.null’ object, both forward search (<code>sig.fwd = 0.20</code>) and backward elimination (<code>sig.bwd = 0.05</code>) will reflect the desired genome-wide significance levels (<span class="math inline">\(\alpha\)</span>):</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">remim.mod &lt;-<span class="st"> </span><span class="kw">remim</span>(<span class="dt">data =</span> data, <span class="dt">w.size =</span> <span class="dv">15</span>, <span class="dt">score.null =</span> score.null, <span class="dt">sig.fwd =</span> <span class="fl">0.2</span>, </a>
-<a class="sourceLine" id="cb9-2" title="2">    <span class="dt">sig.bwd =</span> <span class="fl">0.05</span>, <span class="dt">d.sint =</span> <span class="fl">1.5</span>, <span class="dt">n.clusters =</span> <span class="dv">6</span>, <span class="dt">plot =</span> <span class="st">&quot;remim4x&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb9-2" title="2">    <span class="dt">sig.bwd =</span> <span class="fl">0.05</span>, <span class="dt">d.sint =</span> <span class="fl">1.5</span>, <span class="dt">n.clusters =</span> <span class="dv">6</span>)</a></code></pre></div>
 <p>Otherwise, you can just include the pointwise significance level computed before based on our resampling method, which is the option we are going to use here:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">remim.mod &lt;-<span class="st"> </span><span class="kw">remim</span>(<span class="dt">data =</span> data, <span class="dt">w.size =</span> <span class="dv">15</span>, <span class="dt">sig.fwd =</span> <span class="fl">0.0011493379</span>, <span class="dt">sig.bwd =</span> <span class="fl">0.0002284465</span>, </a>
-<a class="sourceLine" id="cb10-2" title="2">    <span class="dt">d.sint =</span> <span class="fl">1.5</span>, <span class="dt">n.clusters =</span> <span class="dv">6</span>, <span class="dt">plot =</span> <span class="st">&quot;remim4x&quot;</span>)</a>
+<a class="sourceLine" id="cb10-2" title="2">    <span class="dt">d.sint =</span> <span class="fl">1.5</span>, <span class="dt">n.clusters =</span> <span class="dv">6</span>)</a>
 <a class="sourceLine" id="cb10-3" title="3"><span class="co">## INFO: Using 6 CPUs for calculation</span></a>
 <a class="sourceLine" id="cb10-4" title="4"><span class="co">## </span></a>
 <a class="sourceLine" id="cb10-5" title="5"><span class="co">## REMIM for trait 1 &#39;FM07&#39; </span></a>
@@ -1747,7 +1747,7 @@ div.tocify {
 <a class="sourceLine" id="cb10-8" title="8"><span class="co">##   No more QTL were found. A putative QTL on LG 1 at 8 cM (position number 9) did not reach the threshold; its p-value was 0.04462</span></a>
 <a class="sourceLine" id="cb10-9" title="9"><span class="co">##   Refining QTL positions ... 234 ... 382 </span></a>
 <a class="sourceLine" id="cb10-10" title="10"><span class="co">##   Profiling QTL ... 234 ... 382 </span></a>
-<a class="sourceLine" id="cb10-11" title="11"><span class="co">##   Calculation took 260.94 seconds</span></a>
+<a class="sourceLine" id="cb10-11" title="11"><span class="co">##   Calculation took 265.83 seconds</span></a>
 <a class="sourceLine" id="cb10-12" title="12"><span class="co">## </span></a>
 <a class="sourceLine" id="cb10-13" title="13"><span class="co">## REMIM for trait 2 &#39;FM08&#39; </span></a>
 <a class="sourceLine" id="cb10-14" title="14"><span class="co">##   QTL was found on LG 2 at 27 cM (position number 235)</span></a>
@@ -1756,7 +1756,7 @@ div.tocify {
 <a class="sourceLine" id="cb10-17" title="17"><span class="co">##   No more QTL were found. A putative QTL on LG 3 at 110 cM (position number 426) did not reach the threshold; its p-value was 0.00419</span></a>
 <a class="sourceLine" id="cb10-18" title="18"><span class="co">##   Refining QTL positions ... 236 ... 381 ... 10 </span></a>
 <a class="sourceLine" id="cb10-19" title="19"><span class="co">##   Profiling QTL ... 10 ... 235 ... 381 </span></a>
-<a class="sourceLine" id="cb10-20" title="20"><span class="co">##   Calculation took 455.99 seconds</span></a>
+<a class="sourceLine" id="cb10-20" title="20"><span class="co">##   Calculation took 462.09 seconds</span></a>
 <a class="sourceLine" id="cb10-21" title="21"><span class="co">## </span></a>
 <a class="sourceLine" id="cb10-22" title="22"><span class="co">## REMIM for trait 3 &#39;FM14&#39; </span></a>
 <a class="sourceLine" id="cb10-23" title="23"><span class="co">##   QTL was found on LG 2 at 26 cM (position number 234)</span></a>
@@ -1764,7 +1764,7 @@ div.tocify {
 <a class="sourceLine" id="cb10-25" title="25"><span class="co">##   No more QTL were found. A putative QTL on LG 3 at 2 cM (position number 318) did not reach the threshold; its p-value was 0.08978</span></a>
 <a class="sourceLine" id="cb10-26" title="26"><span class="co">##   Refining QTL positions ... 226 ... 382 </span></a>
 <a class="sourceLine" id="cb10-27" title="27"><span class="co">##   Profiling QTL ... 226 ... 382 </span></a>
-<a class="sourceLine" id="cb10-28" title="28"><span class="co">##   Calculation took 190.48 seconds</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-28" title="28"><span class="co">##   Calculation took 186.64 seconds</span></a></code></pre></div>
 <p>Use <code>print()</code> and a summary table for each trait will be shown:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">print</span>(remim.mod)</a>
 <a class="sourceLine" id="cb11-2" title="2"><span class="co">## This is an object of class &#39;qtlpoly.remim&#39;</span></a>

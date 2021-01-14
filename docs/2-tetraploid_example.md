@@ -2,7 +2,7 @@
 title: "Multiple QTL Mapping in an Autotetraploid F~1~ population with QTLpoly"
 subtitle: "A toy example from a real potato full-sib family"
 author: "Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng"
-date: "2020-08-24 (last update 2021-01-13)"
+date: "2020-08-24 (last update 2021-01-14)"
 output:
   html_document:
     theme: cerulean
@@ -56,7 +56,7 @@ print(data, detailed = TRUE)
 sig.fwd <- 0.0011493379  # 20% genome-wide significance level
 sig.bwd <- 0.0002284465  # 5% genome-wide significance level
 remim.mod <- remim(data = data, pheno.col = 1, w.size = 15, sig.fwd = sig.fwd, 
-    sig.bwd = sig.bwd, d.sint = 1.5, n.clusters = 1, plot = "remim4x")
+    sig.bwd = sig.bwd, d.sint = 1.5, n.clusters = 1)
 print(remim.mod)
 plot_profile(data = data, model = remim.mod, grid = TRUE)
 plot_sint(data = data, model = remim.mod)
@@ -233,7 +233,7 @@ In case you have computed the 'score.null' object, both forward search (`sig.fwd
 
 ```r
 remim.mod <- remim(data = data, w.size = 15, score.null = score.null, sig.fwd = 0.2, 
-    sig.bwd = 0.05, d.sint = 1.5, n.clusters = 6, plot = "remim4x")
+    sig.bwd = 0.05, d.sint = 1.5, n.clusters = 6)
 ```
 
 Otherwise, you can just include the pointwise significance level computed before based on our resampling method, which is the option we are going to use here:
@@ -241,7 +241,7 @@ Otherwise, you can just include the pointwise significance level computed before
 
 ```r
 remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0.0002284465, 
-    d.sint = 1.5, n.clusters = 6, plot = "remim4x")
+    d.sint = 1.5, n.clusters = 6)
 ## INFO: Using 6 CPUs for calculation
 ## 
 ## REMIM for trait 1 'FM07' 
@@ -250,7 +250,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 1 at 8 cM (position number 9) did not reach the threshold; its p-value was 0.04462
 ##   Refining QTL positions ... 234 ... 382 
 ##   Profiling QTL ... 234 ... 382 
-##   Calculation took 260.94 seconds
+##   Calculation took 265.83 seconds
 ## 
 ## REMIM for trait 2 'FM08' 
 ##   QTL was found on LG 2 at 27 cM (position number 235)
@@ -259,7 +259,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 3 at 110 cM (position number 426) did not reach the threshold; its p-value was 0.00419
 ##   Refining QTL positions ... 236 ... 381 ... 10 
 ##   Profiling QTL ... 10 ... 235 ... 381 
-##   Calculation took 455.99 seconds
+##   Calculation took 462.09 seconds
 ## 
 ## REMIM for trait 3 'FM14' 
 ##   QTL was found on LG 2 at 26 cM (position number 234)
@@ -267,7 +267,7 @@ remim.mod <- remim(data = data, w.size = 15, sig.fwd = 0.0011493379, sig.bwd = 0
 ##   No more QTL were found. A putative QTL on LG 3 at 2 cM (position number 318) did not reach the threshold; its p-value was 0.08978
 ##   Refining QTL positions ... 226 ... 382 
 ##   Profiling QTL ... 226 ... 382 
-##   Calculation took 190.48 seconds
+##   Calculation took 186.64 seconds
 ```
 
 Use `print()` and a summary table for each trait will be shown:
