@@ -103,7 +103,7 @@ In order to run this tutorial, you will need to install the `qtlpoly` package, w
 
 
 ```r
-install.packages(c("devtools", "data.table"))
+install.packages("devtools")
 devtools::install_url("https://cran.r-project.org/src/contrib/Archive/SPA3G/SPA3G_1.0.tar.gz")
 devtools::install_url("https://cran.r-project.org/src/contrib/Archive/varComp/varComp_0.2-0.tar.gz")
 devtools::install_version("sommer", version = "3.6", repos = "http://cran.us.r-project.org", 
