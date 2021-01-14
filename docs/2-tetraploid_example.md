@@ -35,7 +35,7 @@ editor_options:
 
 # Short code for demo
 
-Please, copy-and-paste the code below to an R script file in RStudio: `File > New File > R Script`.
+Please, copy-and-paste the code below to an R script file in RStudio: `File > New File > R Script`. See [installing the `qtlpoly` package] section if you have not installed it yet.
 
 
 ```r
