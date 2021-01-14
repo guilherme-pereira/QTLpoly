@@ -35,6 +35,8 @@ editor_options:
 
 # Short code for demo
 
+Please, copy-and-paste the code below to an R script file in RStudio: `File > New File > R Script`.
+
 
 ```r
 ## Load package and data
@@ -51,8 +53,8 @@ print(data, detailed = TRUE)
 ## Detect QTL. One needs to run the score-based resampling method before
 ## proceding. Change pheno.col = c(1:3) and increase n.clusters if you
 ## believe your computer can handle it
-sig.fwd <- 0.0011493379
-sig.bwd <- 0.0002284465
+sig.fwd <- 0.0011493379  # 20% genome-wide significance level
+sig.bwd <- 0.0002284465  # 5% genome-wide significance level
 remim.mod <- remim(data = data, pheno.col = 1, w.size = 15, sig.fwd = sig.fwd, 
     sig.bwd = sig.bwd, d.sint = 1.5, n.clusters = 1, plot = "remim4x")
 print(remim.mod)
@@ -73,7 +75,8 @@ y.hat <- breeding_values(data = data, fitted = fitted.mod)
 plot(y.hat)
 
 ## Run FEIM for comparison. One needs to run permutation before proceding
-feim.mod <- feim(data = data, w.size = 15, sig.lod = c(5.68, 5.78, 5.6))
+sig.lod <- c(5.68, 5.78, 5.6)  # 5% genome-wide significance level
+feim.mod <- feim(data = data, w.size = 15, sig.lod = sig.lod)
 print(feim.mod)
 plot_profile(data = data, model = feim.mod, grid = TRUE)
 ```
@@ -118,7 +121,7 @@ library(qtlpoly)
 
 ## Tetraploid potato data
 
-A cross between two potato (*Solanum tuberosum*, 2*n* = 4*x* = 48) cultivars, 'Atlantic' $\times$ 'B1829-5', resulted in 154 full-sibs. The population has been phenotyped (4-year evaluation) and genotyped (8k SNP array), and analyses have been performed to call SNP dosage, build a genetic map and map QTL [@Pereira2020a]. 
+A cross between two potato (*Solanum tuberosum*, 2*n* = 4*x* = 48) cultivars, 'Atlantic' $\times$ 'B1829-5', resulted in 156 full-sibs. The population has been phenotyped (4-year evaluation) and genotyped (8k SNP array), and analyses have been performed to call SNP dosage, build a genetic map and map QTL [@Pereira2020a]. 
 
 For brevity's sake, we have selected three phenotypes (foliage maturity evaluated in years 2007, 2008 and 2014, i.e. FM07, FM08 and FM14) and three linkage groups (LGs, namely 1, 5 and 7) for this demo. Foliage maturity is measured as the "area under the curve" of foliage color along the plant cycle. All analyses can be found at [this GitHub page](https://github.com/mmollina/B2721_map/), though. 
 

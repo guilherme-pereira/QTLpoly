@@ -1592,6 +1592,7 @@ div.tocify {
 
 <div id="short-code-for-demo" class="section level1">
 <h1>Short code for demo</h1>
+<p>Please, copy-and-paste the code below to an R script file in RStudio: <code>File &gt; New File &gt; R Script</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co">## Load package and data</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="kw">library</span>(qtlpoly)</a>
 <a class="sourceLine" id="cb1-3" title="3"><span class="kw">data</span>(<span class="st">&quot;genoprob4x&quot;</span>)</a>
@@ -1606,8 +1607,8 @@ div.tocify {
 <a class="sourceLine" id="cb1-12" title="12"><span class="co">## Detect QTL. One needs to run the score-based resampling method before</span></a>
 <a class="sourceLine" id="cb1-13" title="13"><span class="co">## proceding. Change pheno.col = c(1:3) and increase n.clusters if you</span></a>
 <a class="sourceLine" id="cb1-14" title="14"><span class="co">## believe your computer can handle it</span></a>
-<a class="sourceLine" id="cb1-15" title="15">sig.fwd &lt;-<span class="st"> </span><span class="fl">0.0011493379</span></a>
-<a class="sourceLine" id="cb1-16" title="16">sig.bwd &lt;-<span class="st"> </span><span class="fl">0.0002284465</span></a>
+<a class="sourceLine" id="cb1-15" title="15">sig.fwd &lt;-<span class="st"> </span><span class="fl">0.0011493379</span>  <span class="co"># 20% genome-wide significance level</span></a>
+<a class="sourceLine" id="cb1-16" title="16">sig.bwd &lt;-<span class="st"> </span><span class="fl">0.0002284465</span>  <span class="co"># 5% genome-wide significance level</span></a>
 <a class="sourceLine" id="cb1-17" title="17">remim.mod &lt;-<span class="st"> </span><span class="kw">remim</span>(<span class="dt">data =</span> data, <span class="dt">pheno.col =</span> <span class="dv">1</span>, <span class="dt">w.size =</span> <span class="dv">15</span>, <span class="dt">sig.fwd =</span> sig.fwd, </a>
 <a class="sourceLine" id="cb1-18" title="18">    <span class="dt">sig.bwd =</span> sig.bwd, <span class="dt">d.sint =</span> <span class="fl">1.5</span>, <span class="dt">n.clusters =</span> <span class="dv">1</span>, <span class="dt">plot =</span> <span class="st">&quot;remim4x&quot;</span>)</a>
 <a class="sourceLine" id="cb1-19" title="19"><span class="kw">print</span>(remim.mod)</a>
@@ -1628,9 +1629,10 @@ div.tocify {
 <a class="sourceLine" id="cb1-34" title="34"><span class="kw">plot</span>(y.hat)</a>
 <a class="sourceLine" id="cb1-35" title="35"></a>
 <a class="sourceLine" id="cb1-36" title="36"><span class="co">## Run FEIM for comparison. One needs to run permutation before proceding</span></a>
-<a class="sourceLine" id="cb1-37" title="37">feim.mod &lt;-<span class="st"> </span><span class="kw">feim</span>(<span class="dt">data =</span> data, <span class="dt">w.size =</span> <span class="dv">15</span>, <span class="dt">sig.lod =</span> <span class="kw">c</span>(<span class="fl">5.68</span>, <span class="fl">5.78</span>, <span class="fl">5.6</span>))</a>
-<a class="sourceLine" id="cb1-38" title="38"><span class="kw">print</span>(feim.mod)</a>
-<a class="sourceLine" id="cb1-39" title="39"><span class="kw">plot_profile</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> feim.mod, <span class="dt">grid =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-37" title="37">sig.lod &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">5.68</span>, <span class="fl">5.78</span>, <span class="fl">5.6</span>)  <span class="co"># 5% genome-wide significance level</span></a>
+<a class="sourceLine" id="cb1-38" title="38">feim.mod &lt;-<span class="st"> </span><span class="kw">feim</span>(<span class="dt">data =</span> data, <span class="dt">w.size =</span> <span class="dv">15</span>, <span class="dt">sig.lod =</span> sig.lod)</a>
+<a class="sourceLine" id="cb1-39" title="39"><span class="kw">print</span>(feim.mod)</a>
+<a class="sourceLine" id="cb1-40" title="40"><span class="kw">plot_profile</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> feim.mod, <span class="dt">grid =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -1656,7 +1658,7 @@ div.tocify {
 </div>
 <div id="tetraploid-potato-data" class="section level2">
 <h2>Tetraploid potato data</h2>
-<p>A cross between two potato (<em>Solanum tuberosum</em>, 2<em>n</em> = 4<em>x</em> = 48) cultivars, ‘Atlantic’ <span class="math inline">\(\times\)</span> ‘B1829-5’, resulted in 154 full-sibs. The population has been phenotyped (4-year evaluation) and genotyped (8k SNP array), and analyses have been performed to call SNP dosage, build a genetic map and map QTL <span class="citation">(G. da S. Pereira, Mollinari, et al. 2020)</span>.</p>
+<p>A cross between two potato (<em>Solanum tuberosum</em>, 2<em>n</em> = 4<em>x</em> = 48) cultivars, ‘Atlantic’ <span class="math inline">\(\times\)</span> ‘B1829-5’, resulted in 156 full-sibs. The population has been phenotyped (4-year evaluation) and genotyped (8k SNP array), and analyses have been performed to call SNP dosage, build a genetic map and map QTL <span class="citation">(G. da S. Pereira, Mollinari, et al. 2020)</span>.</p>
 <p>For brevity’s sake, we have selected three phenotypes (foliage maturity evaluated in years 2007, 2008 and 2014, i.e. FM07, FM08 and FM14) and three linkage groups (LGs, namely 1, 5 and 7) for this demo. Foliage maturity is measured as the “area under the curve” of foliage color along the plant cycle. All analyses can be found at <a href="https://github.com/mmollina/B2721_map/">this GitHub page</a>, though.</p>
 <p>Use the function <code>data()</code> to preload the genotype probabilities computed in the LGs 1, 5 and 7 (now called 1, 2 and 3, respectively) as well as the phenotypic data:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">data</span>(<span class="st">&quot;genoprob4x&quot;</span>)</a>
