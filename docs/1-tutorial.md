@@ -1,7 +1,7 @@
 ---
 title: "Tutorial on Multiple QTL Mapping in Autopolyploids with QTLpoly"
 author: "Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng"
-date: "2019-03-30 (last update 2021-01-10)"
+date: "2019-03-30 (last update 2021-01-26)"
 output:
   html_document:
     highlight: tango
@@ -64,10 +64,8 @@ Then, use the function `library()` -- or `require()` -- to load the package, and
 
 ```r
 > library(qtlpoly)
-> data(maps)
-## Warning in data(maps): data set 'maps' not found
-> data(pheno)
-## Warning in data(pheno): data set 'pheno' not found
+> data(maps6x)
+> data(pheno6x)
 ```
 
 These simulated data were made simpler, so that one could run the functions along with this tutorial in a regular personal computer (with 4 cores and 6 GB of RAM, minimum). For real data analyses, you may need to run an R script in a cluster with more cores and RAM, though. In general, the computational needs depend on ploidy level, population size and number of markers.
@@ -312,7 +310,7 @@ Once the first run of forward search has been carried out for each trait, a set 
 
 2. QTL is significant, but in a different position in the linkage group: QTL position is updated (process called "position refinement");
 
-3. QTL is not significant: QTL is dropped (referred as "backward elimination").
+3. QTL is not significant: QTL is dropped (referred to as "backward elimination").
 
 Rounds of model optimization are repeated until no more QTL have their positions updated or are dropped. This process is documented in a series of plots in a PDF file named after each trait (e.g. 'T32_optimize.pdf') with a suffix as in `plot = "optimize"`:
 

@@ -167,12 +167,12 @@ feim <- function(data = data, pheno.col = NULL, w.size = 15, sig.lod = 7, d.sint
         lower <- as.data.frame(matrix(low, ncol=7, byrow=TRUE), stringsAsFactors=FALSE)
         colnames(lower) <- c("LG", "Pos_lower", "Nmrk_lower", "Mrk_lower", "LRT_lower", "LOD_lower", "AdjR2_lower")
         lower[, c(1,2,3,5,6,7)] <- sapply(lower[, c(1,2,3,5,6,7)], as.numeric)
-        lower[, c(2,5,6)] <- round(lower[, c(2,5)], digits = 2)
+        lower[, c(2,5,6)] <- round(lower[, c(2,5,6)], digits = 2)
 
         upper <- as.data.frame(matrix(upp, ncol=7, byrow=TRUE), stringsAsFactors=FALSE)
         colnames(upper) <- c("LG", "Pos_upper", "Nmrk_upper", "Mrk_upper", "LRT_upper", "LOD_upper", "AdjR2_upper")
         upper[, c(1,2,3,5,6,7)] <- sapply(upper[, c(1,2,3,5,6,7)], as.numeric)
-        upper[, c(2,5,6)] <- round(upper[, c(2,5)], digits = 2)
+        upper[, c(2,5,6)] <- round(upper[, c(2,5,6)], digits = 2)
 
       } else {
         lower <- upper <- NULL
