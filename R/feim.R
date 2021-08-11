@@ -147,8 +147,11 @@ feim <- function(data = data, pheno.col = NULL, w.size = 15, sig.lod = 7, d.sint
           }
           lod.out <- LOD[markers.out]
           lod.qtl <- LOD[qtl.mrk[q]]
-          lower <- head(markers.out[which(lod.out >= (lod.qtl - d.sint))],1)
-          upper <- tail(markers.out[which(lod.out >= (lod.qtl - d.sint))],1)
+          qtl.int <- markers.out[which(lod.out >= (lod.qtl - d.sint))]
+          lower <- head(qtl.int, 1)
+          if(lower == qtl.mrk[q] & lower != head(markers.out,1)) lower <- lower - 1
+          upper <- tail(qtl.int, 1)
+          if(upper == qtl.mrk[q] & upper != tail(markers.out,1)) upper <- upper + 1
           low <- c(low, c(qtl.lgr[q],
                           round(unlist(data$lgs)[[lower]], digits = 2),
                           lower,

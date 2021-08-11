@@ -2,7 +2,8 @@
 title: "Multiple QTL Mapping in an Autotetraploid F~1~ population with QTLpoly"
 subtitle: "A toy example from a real potato full-sib family"
 author: "Guilherme da Silva Pereira, Marcelo Mollinari, Zhao-Bang Zeng"
-date: "2020-08-24 (last update 2021-01-14)"
+# date: "2020-08-24 (last update 2021-08-11)"
+date: "2021-02-14 (last update 2021-08-11)"
 output:
   html_document:
     theme: cerulean
