@@ -62,6 +62,7 @@
 #'
 #' @export read_data
 #' @importFrom abind abind
+#' @importFrom arrangements combinations
 
 read_data <- function(ploidy = 6, geno.prob = genoprob, geno.dose = NULL, double.reduction = FALSE, pheno = pheno, weights = NULL, step = 1) {
   
